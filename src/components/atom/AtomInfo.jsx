@@ -11,7 +11,7 @@ export default function AtomInfo({ element, shells, onRecord }) {
         <Readout label="Protons" value={element.Z} accent="#ef5b6f" />
         <Readout label="Neutrons" value={element.neutrons} accent="#5b8def" />
         <Readout label="Electrons" value={element.Z} accent="#4fd8e0" />
-        <Readout label="Category" value={element.category} />
+        <Readout label="Block" value={`${element.block}-block`} />
       </div>
       <div className="qp-shellrow">
         <span className="qp-muted small">Shell configuration:</span>

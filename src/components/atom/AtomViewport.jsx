@@ -2,7 +2,7 @@ import React, { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import StageCanvas from "../common/StageCanvas";
 
-const SHELL_COLORS = ["#4fd8e0", "#6bd68a", "#f2a94e", "#c084fc", "#5b8def", "#ef5b6f"];
+const SHELL_COLORS = ["#4fd8e0", "#6bd68a", "#f2a94e", "#c084fc", "#5b8def", "#ef5b6f", "#e8eef5"];
 
 const NUCLEON_RADIUS = 0.32;
 

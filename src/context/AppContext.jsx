@@ -10,6 +10,8 @@ export const MODULES = [
   { key: "thermo", label: "Thermodynamics", code: "06" },
   { key: "fluid", label: "Fluid Dynamics", code: "07" },
   { key: "quantum", label: "Quantum Physics", code: "08" },
+  { key: "electromagnetism", label: "Electromagnetism", code: "09" },
+  { key: "optics", label: "Optics", code: "10" },
 ];
 
 const AppContext = createContext(null);

@@ -12,6 +12,8 @@ import ParticleLab from "./components/particles/ParticleLab";
 import ThermoLab from "./components/thermo/ThermoLab";
 import FluidLab from "./components/fluid/FluidLab";
 import QuantumLab from "./components/quantum/QuantumLab";
+import EMLab from "./components/electromagnetism/EMLab";
+import OpticsLab from "./components/optics/OpticsLab";
 
 const LABS = {
   atom: AtomLab,
@@ -22,6 +24,8 @@ const LABS = {
   thermo: ThermoLab,
   fluid: FluidLab,
   quantum: QuantumLab,
+  electromagnetism: EMLab,
+  optics: OpticsLab,
 };
 
 function AppShell() {

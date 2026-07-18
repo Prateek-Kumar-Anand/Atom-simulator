@@ -63,4 +63,22 @@ export const THEORY = {
       "Entanglement: two particles can share a correlated quantum state so that measuring one instantly correlates with the other's outcome — but each individual result is still random, and confirming the correlation requires ordinary communication, so no information travels faster than light.",
     ],
   },
+  electromagnetism: {
+    title: "Electromagnetism",
+    body: [
+      "Coulomb's law gives the field and potential of a point charge: E = kQ/r² (a vector pointing away from positive charge) and V = kQ/r (a scalar); field lines start on positive charges and end on negative ones, and their density represents field strength.",
+      "Magnetic fields are always sourced by moving charge: a bar magnet's dipole pattern, a straight wire's concentric circles (B = μ0I/2πr, direction from the right-hand rule), and a solenoid's uniform interior field (B = μ0nI) are all the same underlying physics viewed at different geometries.",
+      "The Lorentz force F = q(E + v × B) is what unifies electric and magnetic effects on a moving charge — the magnetic term is always perpendicular to velocity, so B alone can never speed a particle up or slow it down, only steer it into a curve.",
+      "Maxwell's equations predict a self-sustaining electromagnetic wave: a changing E creates a B, a changing B creates an E, and the pair propagates at c = 1/√(μ0ε0) — no medium required.",
+    ],
+  },
+  optics: {
+    title: "Optics",
+    body: [
+      "Thin lenses and curved mirrors both obey a single reciprocal relationship between object and image distance (1/f = 1/v − 1/u for lenses, 1/f = 1/v + 1/u for mirrors); three principal rays are enough to construct any image geometrically.",
+      "A real image is one where light rays actually converge (can be projected on a screen); a virtual image is where rays only appear to diverge from after passing through the optical element (found by extending rays backward).",
+      "Snell's law, n1·sinθ1 = n2·sinθ2, governs refraction at any interface — light bends toward the normal entering a denser medium, and beyond the critical angle going the other way, it undergoes total internal reflection instead of transmitting at all.",
+      "Diffraction (a single slit spreading light into a broad central band) and interference (two coherent slits adding wave crests and troughs) combine in Young's double-slit experiment: sharp interference fringes riding on top of a broader diffraction envelope.",
+    ],
+  },
 };
