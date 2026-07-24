@@ -170,8 +170,4 @@ audit for correctness.
   page starts a new session. Export your results before reloading if you
   want to keep them.
 
-## License
 
-Provided as-is for educational use. Physics formulas and constants are public
-domain scientific knowledge (CODATA); the code itself may be freely adapted
-for classroom or personal use.
