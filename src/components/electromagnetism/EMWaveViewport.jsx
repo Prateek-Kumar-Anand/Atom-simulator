@@ -2,6 +2,7 @@ import React, { useMemo, useRef } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import StageCanvas from "../common/StageCanvas";
+import Label3D from "../common/Label3D";
 
 const LENGTH = 9;
 const STEPS = 120;
@@ -73,13 +74,37 @@ function PropagationAxis() {
   );
 }
 
+/** A small marker that travels along the propagation axis, visually separating
+ * "the wave moves forward at c" from "the fields oscillate in place" — the two
+ * ideas the standing curve alone tends to blur together. */
+function PropagationPulse({ speed }) {
+  const ref = useRef();
+  const xRef = useRef(-LENGTH / 2 - 0.4);
+  useFrame((_, dt) => {
+    xRef.current += dt * speed * 1.1;
+    if (xRef.current > LENGTH / 2 + 0.4) xRef.current = -LENGTH / 2 - 0.4;
+    if (ref.current) ref.current.position.x = xRef.current;
+  });
+  return (
+    <mesh ref={ref} rotation={[0, 0, -Math.PI / 2]}>
+      <coneGeometry args={[0.13, 0.34, 12]} />
+      <meshStandardMaterial color="#e8eef5" emissive="#e8eef5" emissiveIntensity={0.9} />
+    </mesh>
+  );
+}
+
 export default function EMWaveViewport({ amplitude, wavelengthFrac, speedFactor }) {
   const cyclesVisible = 1 / wavelengthFrac;
+  const labelX = LENGTH / 2 + 0.7;
   return (
     <StageCanvas cameraDistance={12} minDistance={6} maxDistance={24} autoRotateSpeed={0.4}>
       <PropagationAxis />
+      <PropagationPulse speed={speedFactor} />
       <WaveCurve axis="y" color="#4fd8e0" amplitude={amplitude} cyclesVisible={cyclesVisible} speed={speedFactor} />
       <WaveCurve axis="z" color="#f2a94e" amplitude={amplitude} cyclesVisible={cyclesVisible} speed={speedFactor} />
+      <Label3D text="E" position={[labelX, amplitude, 0]} color="#4fd8e0" scale={0.55} />
+      <Label3D text="B" position={[labelX, 0, amplitude]} color="#f2a94e" scale={0.55} />
+      <Label3D text="c" position={[0, 0.55, 0.55]} color="#e8eef5" scale={0.45} />
     </StageCanvas>
   );
 }

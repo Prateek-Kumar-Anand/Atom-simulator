@@ -10,13 +10,18 @@ function ChargeSphere({ charge, index, setDragging }) {
   const color = isProbe ? "#6bd68a" : charge.q > 0 ? "#ef5b6f" : "#5b8def";
   const radius = isProbe ? 0.22 : 0.32 + Math.min(0.28, Math.abs(charge.q) * 0.012);
   return (
-    <mesh
-      position={[charge.x * SCALE, charge.y * SCALE, 0.02]}
-      onPointerDown={(e) => { e.stopPropagation(); setDragging(index); }}
-    >
-      {isProbe ? <octahedronGeometry args={[radius, 0]} /> : <sphereGeometry args={[radius, 24, 24]} />}
-      <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.85} />
-    </mesh>
+    <group position={[charge.x * SCALE, charge.y * SCALE, 0.02]}>
+      {!isProbe && (
+        <mesh>
+          <sphereGeometry args={[radius * 2.1, 16, 16]} />
+          <meshBasicMaterial color={color} transparent opacity={0.12} depthWrite={false} />
+        </mesh>
+      )}
+      <mesh onPointerDown={(e) => { e.stopPropagation(); setDragging(index); }}>
+        {isProbe ? <octahedronGeometry args={[radius, 0]} /> : <sphereGeometry args={[radius, 24, 24]} />}
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.85} roughness={0.35} metalness={0.15} />
+      </mesh>
+    </group>
   );
 }
 

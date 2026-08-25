@@ -146,6 +146,107 @@ export function elementRefractiveIndex(Z) {
   return 1.3 + ((Z * 37) % 100) / 100;
 }
 
+// --- Ray optics: prism dispersion -------------------------------------------
+
+/**
+ * Two-term Cauchy dispersion equation: n(λ) = A + B/λ², with λ in micrometres.
+ * A good teaching-accurate fit to real glasses across the visible band (the
+ * coefficients below reproduce BK7 crown glass's tabulated n_F/n_d/n_C to
+ * within ~0.001) while staying simple enough to invert/differentiate by hand.
+ */
+export function cauchyIndex(wavelengthNm, A, B) {
+  const lambdaUm = wavelengthNm / 1000;
+  return A + B / (lambdaUm * lambdaUm);
+}
+
+/** Dispersive glass presets (Cauchy A, B) for the prism experiment. */
+export const GLASS_PRESETS = [
+  { key: "crown", label: "Crown glass (BK7)", A: 1.5046, B: 0.0042 },
+  { key: "flint", label: "Flint glass", A: 1.6200, B: 0.0135 },
+  { key: "denseFlint", label: "Dense flint glass", A: 1.7200, B: 0.0200 },
+  { key: "diamond", label: "Diamond (illustrative)", A: 2.379, B: 0.0134 },
+];
+
+/** Vector form of Snell's law. d = incident unit direction (propagation), N = unit
+ * normal pointing back toward the side the ray arrived from (dot(N,d) < 0), eta =
+ * n_from/n_to. Returns the refracted unit direction, or null on total internal reflection. */
+function refractVector(d, N, eta) {
+  const cosI = -(d.x * N.x + d.y * N.y);
+  const sin2T = eta * eta * (1 - cosI * cosI);
+  if (sin2T > 1) return null;
+  const cosT = Math.sqrt(1 - sin2T);
+  const k = eta * cosI - cosT;
+  return { x: eta * d.x + k * N.x, y: eta * d.y + k * N.y };
+}
+
+function rotate(v, rad) {
+  const c = Math.cos(rad), s = Math.sin(rad);
+  return { x: v.x * c - v.y * s, y: v.x * s + v.y * c };
+}
+
+/**
+ * Trace one ray of refractive index n through a symmetric triangular prism
+ * (apex at the origin pointing toward +y, base below). incidenceDeg is the
+ * angle of incidence on the first face, measured from that face's normal.
+ * Returns the full geometric path plus the deviation angle, or a TIR flag.
+ */
+export function tracePrismRay(apexAngleDeg, incidenceDeg, n, opts = {}) {
+  const { faceLen = 3.2, entryFrac = 0.55, backTraceLen = 3.4, exitLen = 3.6 } = opts;
+  const half = (apexAngleDeg * Math.PI) / 360; // (A/2) in radians
+  const apex = { x: 0, y: 0 };
+  const dLeft = { x: -Math.sin(half), y: -Math.cos(half) };
+  const dRight = { x: Math.sin(half), y: -Math.cos(half) };
+  const baseLeft = { x: dLeft.x * faceLen, y: dLeft.y * faceLen };
+  const baseRight = { x: dRight.x * faceLen, y: dRight.y * faceLen };
+  const Nleft = { x: -Math.cos(half), y: Math.sin(half) };
+  const Nright = { x: Math.cos(half), y: Math.sin(half) };
+
+  const P0 = { x: dLeft.x * faceLen * entryFrac, y: dLeft.y * faceLen * entryFrac };
+  const t1 = (incidenceDeg * Math.PI) / 180;
+  const dIncident = rotate({ x: -Nleft.x, y: -Nleft.y }, t1);
+  const sourcePoint = { x: P0.x - dIncident.x * backTraceLen, y: P0.y - dIncident.y * backTraceLen };
+  const geometry = { apex, baseLeft, baseRight, incident: [sourcePoint, P0] };
+
+  const d1 = refractVector(dIncident, Nleft, 1 / n);
+  if (!d1) return { tir: true, stage: "entry", ...geometry };
+
+  const denom = d1.x * Nright.x + d1.y * Nright.y;
+  const tHit = denom !== 0 ? -(P0.x * Nright.x + P0.y * Nright.y) / denom : Infinity;
+  const P1 = { x: P0.x + d1.x * tHit, y: P0.y + d1.y * tHit };
+  geometry.internal = [P0, P1];
+
+  const d2 = refractVector(d1, { x: -Nright.x, y: -Nright.y }, n);
+  if (!d2) return { tir: true, stage: "exit", ...geometry };
+
+  const P2 = { x: P1.x + d2.x * exitLen, y: P1.y + d2.y * exitLen };
+  const dot = Math.max(-1, Math.min(1, dIncident.x * d2.x + dIncident.y * d2.y));
+  const deviationDeg = (Math.acos(dot) * 180) / Math.PI;
+
+  return { tir: false, ...geometry, exit: [P1, P2], deviationDeg };
+}
+
+/** Trace the same incidence geometry across several wavelengths through one glass
+ * preset — the core of the dispersion/rainbow-fan visualization. */
+export function prismDispersionFan(apexAngleDeg, incidenceDeg, glass, wavelengthsNm, opts) {
+  return wavelengthsNm.map((wavelengthNm) => {
+    const n = cauchyIndex(wavelengthNm, glass.A, glass.B);
+    return { wavelengthNm, n, ...tracePrismRay(apexAngleDeg, incidenceDeg, n, opts) };
+  });
+}
+
+/** Angle of minimum deviation for a symmetric ray path (r1 = r2 = A/2): a classic
+ * prism-spectrometer reference value, used to measure n from a measured δmin. */
+export function minimumDeviationDeg(apexAngleDeg, n) {
+  const halfA = (apexAngleDeg * Math.PI) / 360;
+  const s = n * Math.sin(halfA);
+  if (s > 1) return null; // no symmetric solution exists at this n/apex combination
+  const theta1 = Math.asin(s);
+  return (2 * theta1 - apexAngleDeg * (Math.PI / 180)) * (180 / Math.PI);
+}
+
+/** Representative visible-spectrum sample wavelengths (violet -> red) for the ray fan. */
+export const SPECTRUM_SAMPLE_NM = [430, 460, 490, 520, 550, 580, 610, 640, 670];
+
 // --- Diffraction & interference ---------------------------------------------
 
 function sinc(x) {

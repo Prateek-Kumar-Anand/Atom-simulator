@@ -79,6 +79,7 @@ export const THEORY = {
       "A real image is one where light rays actually converge (can be projected on a screen); a virtual image is where rays only appear to diverge from after passing through the optical element (found by extending rays backward).",
       "Snell's law, n1·sinθ1 = n2·sinθ2, governs refraction at any interface — light bends toward the normal entering a denser medium, and beyond the critical angle going the other way, it undergoes total internal reflection instead of transmitting at all.",
       "Diffraction (a single slit spreading light into a broad central band) and interference (two coherent slits adding wave crests and troughs) combine in Young's double-slit experiment: sharp interference fringes riding on top of a broader diffraction envelope.",
+      "Dispersion: a glass's refractive index n(λ) is slightly higher for shorter wavelengths, so a prism bends violet light more than red — tracing each color's ray through both faces of a prism fans white light into a spectrum, the same demonstration Newton used in 1666.",
     ],
   },
 };

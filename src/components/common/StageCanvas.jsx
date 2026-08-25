@@ -9,7 +9,7 @@ import { OrbitControls, Stars } from "@react-three/drei";
  * pointer/scroll orbit controls so individual experiments only need to
  * describe their own geometry.
  */
-export default function StageCanvas({ children, cameraDistance = 12, minDistance = 4, maxDistance = 34, autoRotateSpeed = 0.6 }) {
+export default function StageCanvas({ children, cameraDistance = 12, minDistance = 4, maxDistance = 34, autoRotateSpeed = 0.6, controlsEnabled = true }) {
   return (
     <Canvas
       className="qp-viewport"
@@ -23,6 +23,7 @@ export default function StageCanvas({ children, cameraDistance = 12, minDistance
       <Stars radius={140} depth={60} count={2000} factor={2} fade speed={0.4} />
       {children}
       <OrbitControls
+        enabled={controlsEnabled}
         enablePan={false}
         minDistance={minDistance}
         maxDistance={maxDistance}

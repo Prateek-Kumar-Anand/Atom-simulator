@@ -3,7 +3,7 @@ import { Info } from "lucide-react";
 import HUD from "../common/HUD";
 import Readout from "../common/Readout";
 import MagneticFieldViewport from "./MagneticFieldViewport";
-import { wireFieldAt, solenoidFieldInside, MU0 } from "../../physics/electromagnetism";
+import { wireFieldAt, solenoidFieldInside, barMagnetFieldAt, MU0 } from "../../physics/electromagnetism";
 import { fmt } from "../../physics/constants";
 import { useApp } from "../../context/AppContext";
 
@@ -20,20 +20,38 @@ export default function MagneticFieldLab() {
   const [strength, setStrength] = useState(6);
   const [direction, setDirection] = useState(1);
   const [turnsPerCm, setTurnsPerCm] = useState(8);
-  const [probeR, setProbeR] = useState(2);
+  const [probe, setProbe] = useState({ x: 2.6, y: 1.7 });
 
-  const wireB = useMemo(() => wireFieldAt(current * direction, probeR, 0), [current, direction, probeR]);
   const solenoidB = useMemo(() => solenoidFieldInside(current * direction, turnsPerCm * 100), [current, direction, turnsPerCm]);
+
+  const probeField = useMemo(() => {
+    if (source === "bar") return barMagnetFieldAt(strength, probe.x, probe.y);
+    if (source === "wire") return wireFieldAt(current * direction, probe.x, probe.y);
+    return null;
+  }, [source, strength, current, direction, probe]);
+
+  const probeR = Math.hypot(probe.x, probe.y);
+  const probeAngleDeg = probeField ? (Math.atan2(probeField.By ?? probeField.y, probeField.Bx ?? probeField.x) * 180) / Math.PI : null;
 
   return (
     <div className="qp-lab-grid">
       <div className="qp-main-col">
         <p className="qp-instructions">
           <Info size={14} /> Switch between sources to compare field-line shapes: closed loops
-          around a magnet, concentric circles around a wire, and a uniform field inside a solenoid.
+          around a magnet, concentric circles around a wire, and a uniform field inside a
+          solenoid. For the magnet and wire, drag the green compass needle anywhere in the plane —
+          it always swings to point along the local field direction, just like a real compass.
         </p>
         <HUD label={`MAGNETIC FIELD · ${SOURCES.find((s) => s.key === source).label.toUpperCase()}`}>
-          <MagneticFieldViewport source={source} strength={strength} currentA={current} direction={direction} />
+          <MagneticFieldViewport
+            source={source}
+            strength={strength}
+            currentA={current}
+            direction={direction}
+            probe={probe}
+            onDragProbe={(x, y) => setProbe({ x, y })}
+            probeField={probeField}
+          />
         </HUD>
       </div>
 
@@ -69,12 +87,6 @@ export default function MagneticFieldLab() {
               <input type="range" min={2} max={20} step={1} value={turnsPerCm} className="qp-slider" onChange={(e) => setTurnsPerCm(Number(e.target.value))} />
             </div>
           )}
-          {source === "wire" && (
-            <div className="qp-slider-row">
-              <label>Probe distance r = {probeR.toFixed(1)} cm</label>
-              <input type="range" min={0.5} max={6} step={0.1} value={probeR} className="qp-slider" onChange={(e) => setProbeR(Number(e.target.value))} />
-            </div>
-          )}
           {source !== "bar" && (
             <div className="qp-chip-row">
               <button className={"qp-chip" + (direction === 1 ? " active" : "")} onClick={() => setDirection(1)}>Direction: + (out of page)</button>
@@ -88,7 +100,9 @@ export default function MagneticFieldLab() {
           <div className="qp-readout-grid">
             {source === "wire" && (
               <>
-                <Readout label="B = μ₀I/2πr" value={`${fmt(wireB.mT, 4)} mT`} accent="#4fd8e0" />
+                <Readout label="Probe distance r" value={`${fmt(probeR, 2)} cm`} />
+                <Readout label="B = μ₀I/2πr at probe" value={`${fmt(probeField.mT, 4)} mT`} accent="#4fd8e0" />
+                <Readout label="Field direction (compass)" value={`${fmt(probeAngleDeg, 1)}°`} />
                 <Readout label="μ₀" value={`${fmt(MU0, 4)} T·m/A`} />
               </>
             )}
@@ -96,7 +110,11 @@ export default function MagneticFieldLab() {
               <Readout label="B = μ₀nI (inside)" value={`${fmt(solenoidB * 1000, 4)} mT`} accent="#4fd8e0" />
             )}
             {source === "bar" && (
-              <Readout label="Field model" value="Magnetic dipole" accent="#4fd8e0" />
+              <>
+                <Readout label="Field model" value="Magnetic dipole" accent="#4fd8e0" />
+                <Readout label="Compass distance from magnet" value={`${fmt(probeR, 2)}`} />
+                <Readout label="Field direction (compass)" value={`${fmt(probeAngleDeg, 1)}°`} />
+              </>
             )}
           </div>
           <button
@@ -104,7 +122,9 @@ export default function MagneticFieldLab() {
             onClick={() => log(
               "Electromagnetism: Magnetic Field",
               `${SOURCES.find((s) => s.key === source).label}, I=${current}A`,
-              source === "wire" ? `B=${fmt(wireB.mT, 3)} mT at r=${probeR}cm` : source === "solenoid" ? `B=${fmt(solenoidB * 1000, 3)} mT inside` : `strength=${strength}`
+              source === "wire" ? `B=${fmt(probeField.mT, 3)} mT at r=${fmt(probeR, 2)}cm, dir=${fmt(probeAngleDeg, 1)}°`
+                : source === "solenoid" ? `B=${fmt(solenoidB * 1000, 3)} mT inside`
+                : `strength=${strength}, compass dir=${fmt(probeAngleDeg, 1)}° at r=${fmt(probeR, 2)}`
             )}
           >
             Record result

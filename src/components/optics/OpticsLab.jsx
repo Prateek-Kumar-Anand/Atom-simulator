@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import LensLab from "./LensLab";
 import MirrorLab from "./MirrorLab";
 import RefractionLab from "./RefractionLab";
+import PrismLab from "./PrismLab";
 import DiffractionLab from "./DiffractionLab";
 
 const EXPERIMENTS = [
   { key: "lens", label: "Lens", Component: LensLab },
   { key: "mirror", label: "Mirror", Component: MirrorLab },
   { key: "refraction", label: "Refraction", Component: RefractionLab },
+  { key: "prism", label: "Ray Optics (Prism)", Component: PrismLab },
   { key: "diffraction", label: "Diffraction & Interference", Component: DiffractionLab },
 ];
 

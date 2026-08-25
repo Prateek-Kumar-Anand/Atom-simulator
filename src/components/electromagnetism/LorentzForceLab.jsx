@@ -43,7 +43,7 @@ export default function LorentzForceLab() {
           perpendicular to velocity, so it changes direction but never speed from B alone.
         </p>
         <HUD label={`LORENTZ FORCE · q=${chargeMultiple > 0 ? "+" : ""}${chargeMultiple}e`}>
-          <LorentzForceViewport trajectoryPoints={trajectory.pts} particleCharge={q} />
+          <LorentzForceViewport trajectoryPoints={trajectory.pts} particleCharge={q} bz={B.z} ey={E.y} />
         </HUD>
       </div>
 
