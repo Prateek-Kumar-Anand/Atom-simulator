@@ -5,6 +5,7 @@ export const THEORY = {
       "An atom consists of a dense, positively charged nucleus (protons + neutrons) surrounded by electrons occupying discrete energy shells.",
       "Nuclear radius scales approximately as r ≈ r₀·A^(1/3), which is why heavier nuclei are only modestly larger than light ones.",
       "Shell capacities follow 2, 8, 8, 18, 18, 32 (2n² up to a cap) — the simplified Bohr model taught before quantum subshells (s, p, d, f).",
+      "The periodic table's shape is a direct picture of subshell filling order: each row (period) ends when a shell of s/p subshells is complete, and an element's column (group) shares its outermost electron count — which is why elements in the same group behave chemically alike.",
     ],
   },
   spectrum: {

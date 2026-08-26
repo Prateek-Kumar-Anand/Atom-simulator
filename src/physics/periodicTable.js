@@ -119,3 +119,80 @@ export function getFullShellConfig(Z) {
   while (shells.length > 1 && shells[shells.length - 1] === 0) shells.pop();
   return shells;
 }
+
+const ORBITAL_LETTER = { 2: "s", 6: "p", 10: "d", 14: "f" };
+const ORBITAL_ORDER = { s: 0, p: 1, d: 2, f: 3 };
+const SUPERSCRIPT = { 0: "⁰", 1: "¹", 2: "²", 3: "³", 4: "⁴", 5: "⁵", 6: "⁶", 7: "⁷", 8: "⁸", 9: "⁹" };
+
+/**
+ * Per-subshell electron configuration (same Aufbau fill + d-block exceptions as
+ * getFullShellConfig, just not summed by principal shell), returned in the
+ * conventional written order: increasing n, then increasing l (s, p, d, f)
+ * within each n — e.g. chromium comes out as 3d before 4s, matching how every
+ * textbook writes "...3d⁵ 4s¹" rather than the Aufbau fill order itself.
+ */
+export function getSubshellConfig(Z) {
+  const subshells = [];
+  let remaining = Z;
+  for (const [n, cap] of AUFBAU_ORDER) {
+    if (remaining <= 0) break;
+    const take = Math.min(cap, remaining);
+    subshells.push({ n, cap, l: ORBITAL_LETTER[cap], count: take });
+    remaining -= take;
+  }
+  const ex = D_BLOCK_EXCEPTIONS[Z];
+  if (ex) {
+    const sEntry = subshells.find((s) => s.n === ex.from && s.cap === 2);
+    const dEntry = subshells.find((s) => s.n === ex.to && s.cap === 10);
+    if (sEntry) sEntry.count -= ex.count;
+    if (dEntry) dEntry.count += ex.count;
+  }
+  return subshells
+    .filter((s) => s.count > 0)
+    .sort((a, b) => a.n - b.n || ORBITAL_ORDER[a.l] - ORBITAL_ORDER[b.l]);
+}
+
+/** The subshell configuration as a conventional notation string, e.g. "1s² 2s² 2p⁶ ... 3d⁵ 4s¹". */
+export function formatElectronConfig(Z) {
+  return getSubshellConfig(Z)
+    .map((s) => `${s.n}${s.l}${String(s.count).split("").map((d) => SUPERSCRIPT[d]).join("")}`)
+    .join(" ");
+}
+
+/**
+ * Standard-layout grid coordinates (1-indexed period/group) for the 18-column,
+ * 7-period periodic table. Lanthanides (57–71) and actinides (89–103) are
+ * pulled out of the main body into two 15-wide footnote rows (the layout
+ * used on virtually every printed periodic table), so they carry
+ * isFootnote + footnoteRow/footnoteCol instead of a period/group.
+ */
+export function getGridPosition(Z) {
+  if (Z >= 1 && Z <= 2) return { period: 1, group: Z === 1 ? 1 : 18 };
+  if (Z >= 3 && Z <= 10) { const i = Z - 3; return { period: 2, group: i < 2 ? 1 + i : 13 + (i - 2) }; }
+  if (Z >= 11 && Z <= 18) { const i = Z - 11; return { period: 3, group: i < 2 ? 1 + i : 13 + (i - 2) }; }
+  if (Z >= 19 && Z <= 36) {
+    const i = Z - 19;
+    const group = i < 2 ? 1 + i : i < 12 ? 3 + (i - 2) : 13 + (i - 12);
+    return { period: 4, group };
+  }
+  if (Z >= 37 && Z <= 54) {
+    const i = Z - 37;
+    const group = i < 2 ? 1 + i : i < 12 ? 3 + (i - 2) : 13 + (i - 12);
+    return { period: 5, group };
+  }
+  if (Z === 55 || Z === 56) return { period: 6, group: Z - 54 };
+  if (Z >= 57 && Z <= 71) return { period: 6, footnote: "lanthanide", footnoteRow: 1, footnoteCol: 3 + (Z - 57) };
+  if (Z >= 72 && Z <= 86) {
+    const i = Z - 72;
+    const group = i < 9 ? 4 + i : 13 + (i - 9);
+    return { period: 6, group };
+  }
+  if (Z === 87 || Z === 88) return { period: 7, group: Z - 86 };
+  if (Z >= 89 && Z <= 103) return { period: 7, footnote: "actinide", footnoteRow: 2, footnoteCol: 3 + (Z - 89) };
+  if (Z >= 104 && Z <= 118) {
+    const i = Z - 104;
+    const group = i < 9 ? 4 + i : 13 + (i - 9);
+    return { period: 7, group };
+  }
+  return { period: 1, group: 1 };
+}
