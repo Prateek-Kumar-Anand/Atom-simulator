@@ -4,6 +4,7 @@ import TopBar from "./components/layout/TopBar";
 import Sidebar from "./components/layout/Sidebar";
 import TheoryDrawer from "./components/layout/TheoryDrawer";
 import Notebook from "./components/layout/Notebook";
+import ErrorBoundary from "./components/layout/ErrorBoundary";
 import AtomLab from "./components/atom/AtomLab";
 import SpectrumLab from "./components/spectrum/SpectrumLab";
 import PhotoelectricLab from "./components/photoelectric/PhotoelectricLab";
@@ -36,7 +37,9 @@ function AppShell() {
       <TopBar />
       <Sidebar />
       <main className="qp-main">
-        <ActiveLab />
+        <ErrorBoundary resetKey={active}>
+          <ActiveLab />
+        </ErrorBoundary>
       </main>
       <TheoryDrawer />
       <Notebook />
