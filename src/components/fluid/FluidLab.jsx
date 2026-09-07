@@ -83,6 +83,20 @@ export default function FluidLab() {
         </div>
 
         <div className="qp-card">
+          <h4>Bernoulli&rsquo;s principle</h4>
+          <p className="qp-instructions" style={{ marginBottom: 8 }}>
+            <Info size={14} /> Static pressure + dynamic pressure (½ρv²) is conserved along the
+            streamline — the two totals below match, confirming it.
+          </p>
+          <div className="qp-readout-grid">
+            <Readout label="Dynamic pressure q₁ (inlet)" value={`${fmt(solved.bernoulli.q1 / 1000, 3)} kPa`} />
+            <Readout label="Dynamic pressure q₂ (throat)" value={`${fmt(solved.bernoulli.q2 / 1000, 3)} kPa`} accent="#4fd8e0" />
+            <Readout label="Total pressure P₁ + q₁" value={`${fmt(solved.bernoulli.total1 / 1000, 3)} kPa`} accent="#f2a94e" />
+            <Readout label="Total pressure P₂ + q₂" value={`${fmt(solved.bernoulli.total2 / 1000, 3)} kPa`} accent="#f2a94e" />
+          </div>
+        </div>
+
+        <div className="qp-card">
           <h4>Results</h4>
           <div className="qp-readout-grid">
             <Readout label="Inlet velocity v₁" value={`${fmt(solved.v1, 3)} m/s`} />

@@ -3,9 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <!--
+      Defense-in-depth CSP for a purely static, offline app: it makes no network
+      requests of its own, so this locks script execution and connections down to
+      same-origin only. style-src needs 'unsafe-inline' because React sets some
+      inline style="" attributes at runtime (e.g. the r3f canvas, progress bars);
+      that's a much lower-severity allowance than permitting inline/external script.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';" />
     <meta name="description" content="QUANTA — an interactive 3D atomic physics virtual laboratory: atomic structure, the hydrogen spectrum, the photoelectric effect, radioactive decay, and particle collisions." />
     <title>QUANTA · Atomic Physics Virtual Laboratory</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%228%22 fill=%22%234fd8e0%22/><ellipse cx=%2250%22 cy=%2250%22 rx=%2245%22 ry=%2216%22 fill=%22none%22 stroke=%22%234fd8e0%22 stroke-width=%224%22/></svg>" />
+    <link rel="icon" type="image/x-icon" href="./favicon.ico" />
+    <link rel="icon" type="image/png" sizes="16x16" href="./icons/favicon-16x16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="./icons/favicon-48x48.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png" />
   </head>
   <body>
     <div id="root"></div>

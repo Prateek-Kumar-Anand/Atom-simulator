@@ -57,6 +57,23 @@ export function bernoulliPressure(P1, density, v1, v2) {
   return P1 + 0.5 * density * (v1 * v1 - v2 * v2);
 }
 
+/** Dynamic pressure, ½ρv² — the "speed" term in Bernoulli's equation. */
+export function dynamicPressure(density, v) {
+  return 0.5 * density * v * v;
+}
+
+/**
+ * Bernoulli's principle, made explicit and checkable: static pressure + dynamic
+ * pressure (the "total"/"stagnation" pressure along a streamline) is conserved.
+ * Returns both points' totals so they can be displayed side by side — they come
+ * out equal by construction, which is the whole point of the principle.
+ */
+export function bernoulliCheck(P1, P2, density, v1, v2) {
+  const q1 = dynamicPressure(density, v1);
+  const q2 = dynamicPressure(density, v2);
+  return { q1, q2, total1: P1 + q1, total2: P2 + q2 };
+}
+
 export function reynoldsNumber(density, velocity, diameter, viscosity) {
   return (density * velocity * diameter) / viscosity;
 }
@@ -77,12 +94,14 @@ export function solvePipeFlow({ v1, d1, d2, P1, fluid }) {
   const P2 = bernoulliPressure(P1, fluid.density, v1, v2);
   const Re1 = reynoldsNumber(fluid.density, v1, d1, fluid.viscosity);
   const Re2 = reynoldsNumber(fluid.density, v2, d2, fluid.viscosity);
+  const bernoulli = bernoulliCheck(P1, P2, fluid.density, v1, v2);
   return {
     v1, v2, P1, P2,
     Re1, Re2,
     regime1: flowRegime(Re1),
     regime2: flowRegime(Re2),
     Q: v1 * pipeArea(d1), // volumetric flow rate, m^3/s (same at both ends by continuity)
+    bernoulli, // { q1, q2, total1, total2 } — static + dynamic pressure at each point
   };
 }
 

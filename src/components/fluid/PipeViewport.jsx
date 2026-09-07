@@ -3,19 +3,10 @@ import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import StageCanvas from "../common/StageCanvas";
 import { pipeDiameterAt } from "../../physics/fluidDynamics";
+import { makeSeededRandom } from "../../physics/random";
 
 const LENGTH = 10; // visual pipe length (world units), independent of physical units
 const N_PARTICLES = 90;
-
-function makeSeededRandom(seed) {
-  let s = seed >>> 0;
-  return function rand() {
-    s = (s + 0x6d2b79f5) | 0;
-    let t = Math.imul(s ^ (s >>> 15), 1 | s);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
 
 /** Visual pipe shell built by revolving a radius(y) profile around the flow axis — the
  * same converging/diverging throat shape used by the physics module (pipeDiameterAt). */

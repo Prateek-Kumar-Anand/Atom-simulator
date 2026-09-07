@@ -2,21 +2,12 @@ import React, { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import StageCanvas from "../common/StageCanvas";
+import { makeSeededRandom } from "../../physics/random";
 
 const HALF_SIDE = 1.6;
 const BASE_Y = -3;
 const N_MOLECULES = 28;
 const BASE_SPEED = 2.6;
-
-function makeSeededRandom(seed) {
-  let s = seed >>> 0;
-  return function rand() {
-    s = (s + 0x6d2b79f5) | 0;
-    let t = Math.imul(s ^ (s >>> 15), 1 | s);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
 
 function Cylinder({ height }) {
   const geo = useMemo(() => new THREE.EdgesGeometry(new THREE.BoxGeometry(HALF_SIDE * 2, height, HALF_SIDE * 2)), [height]);

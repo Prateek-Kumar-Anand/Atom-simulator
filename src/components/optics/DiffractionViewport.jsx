@@ -23,22 +23,36 @@ function ScreenStrip({ pattern, color }) {
   );
 }
 
-function SlitBarrier({ mode, slitSeparationUm }) {
-  const gap = mode === "double" ? Math.min(1.4, (slitSeparationUm / 60) * 0.6) : 0;
+const HALF_SPAN = 3.4; // total half-height of the barrier structure
+
+function SlitBarrier({ mode, slitSeparationUm, slitWidthUm }) {
+  // Visual height of each individual slit opening — this used to be ignored
+  // entirely, so the "slit width" slider had no effect on the 3D scene even
+  // though it correctly changed the physics/chart.
+  const openingH = Math.min(1.2, Math.max(0.12, (slitWidthUm / 50) * 1.2));
+
+  if (mode === "single") {
+    const barLen = HALF_SPAN - openingH / 2;
+    const barY = openingH / 2 + barLen / 2;
+    return (
+      <group position={[0, 0, 0]}>
+        <mesh position={[0, barY, 0]}><boxGeometry args={[0.15, barLen, 0.15]} /><meshStandardMaterial color="#7c8a9c" /></mesh>
+        <mesh position={[0, -barY, 0]}><boxGeometry args={[0.15, barLen, 0.15]} /><meshStandardMaterial color="#7c8a9c" /></mesh>
+      </group>
+    );
+  }
+
+  // Double slit: a central opaque post separates the two openings. Its height
+  // tracks the separation slider (as before); each opening's own height now
+  // tracks the width slider instead of staying a fixed size.
+  const postHeight = Math.min(1.8, Math.max(0.3, (slitSeparationUm / 200) * 1.8));
+  const outerLen = HALF_SPAN - postHeight / 2 - openingH;
+  const outerY = postHeight / 2 + openingH + outerLen / 2;
   return (
     <group position={[0, 0, 0]}>
-      {mode === "single" ? (
-        <>
-          <mesh position={[0, 1.9, 0]}><boxGeometry args={[0.15, 3, 0.15]} /><meshStandardMaterial color="#7c8a9c" /></mesh>
-          <mesh position={[0, -1.9, 0]}><boxGeometry args={[0.15, 3, 0.15]} /><meshStandardMaterial color="#7c8a9c" /></mesh>
-        </>
-      ) : (
-        <>
-          <mesh position={[0, 2.6, 0]}><boxGeometry args={[0.15, 1.8, 0.15]} /><meshStandardMaterial color="#7c8a9c" /></mesh>
-          <mesh position={[0, 0, 0]}><boxGeometry args={[0.15, gap, 0.15]} /><meshStandardMaterial color="#7c8a9c" /></mesh>
-          <mesh position={[0, -2.6, 0]}><boxGeometry args={[0.15, 1.8, 0.15]} /><meshStandardMaterial color="#7c8a9c" /></mesh>
-        </>
-      )}
+      <mesh position={[0, outerY, 0]}><boxGeometry args={[0.15, outerLen, 0.15]} /><meshStandardMaterial color="#7c8a9c" /></mesh>
+      <mesh position={[0, 0, 0]}><boxGeometry args={[0.15, postHeight, 0.15]} /><meshStandardMaterial color="#7c8a9c" /></mesh>
+      <mesh position={[0, -outerY, 0]}><boxGeometry args={[0.15, outerLen, 0.15]} /><meshStandardMaterial color="#7c8a9c" /></mesh>
     </group>
   );
 }
@@ -47,7 +61,7 @@ export default function DiffractionViewport({ mode, pattern, wavelengthNm, slitS
   const color = useMemo(() => wavelengthToColor(wavelengthNm), [wavelengthNm]);
   return (
     <StageCanvas cameraDistance={10} minDistance={5} maxDistance={20} autoRotateSpeed={0.25}>
-      <SlitBarrier mode={mode} slitSeparationUm={slitSeparationUm} />
+      <SlitBarrier mode={mode} slitSeparationUm={slitSeparationUm} slitWidthUm={slitWidthUm} />
       <ScreenStrip pattern={pattern} color={color} />
     </StageCanvas>
   );

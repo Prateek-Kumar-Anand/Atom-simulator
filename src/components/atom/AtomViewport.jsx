@@ -1,21 +1,11 @@
 import React, { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import StageCanvas from "../common/StageCanvas";
+import { makeSeededRandom } from "../../physics/random";
 
 const SHELL_COLORS = ["#4fd8e0", "#6bd68a", "#f2a94e", "#c084fc", "#5b8def", "#ef5b6f", "#e8eef5"];
 
 const NUCLEON_RADIUS = 0.32;
-
-/** Deterministic seeded PRNG (mulberry32) so the packing is stable across re-renders. */
-function makeSeededRandom(seed) {
-  let s = seed >>> 0;
-  return function rand() {
-    s = (s + 0x6d2b79f5) | 0;
-    let t = Math.imul(s ^ (s >>> 15), 1 | s);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
 
 /**
  * Tight nucleon packing: nucleons start at random points inside a small ball
