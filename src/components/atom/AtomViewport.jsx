@@ -9,10 +9,17 @@ const NUCLEON_RADIUS = 0.32;
 
 /**
  * Tight nucleon packing: nucleons start at random points inside a small ball
- * and are relaxed (pairwise separation + gentle centering pull) until every
- * pair sits at ~touching distance (2 × nucleon radius). This is a compact,
- * jitter-free cluster — much closer to how a real nucleus looks — instead of
- * the loose, evenly-spread-out fibonacci-sphere layout used previously.
+ * and are relaxed until they settle into a compact, touching cluster — much
+ * closer to how a real nucleus looks — instead of the loose, evenly-spread-out
+ * fibonacci-sphere layout used previously.
+ *
+ * The relaxation needs two forces: pairwise repulsion (so nucleons never
+ * overlap) AND a real inward pull toward the cluster's own centroid (so gaps
+ * between nucleons actually close). An earlier version only had the first —
+ * every pair correctly stayed at or above touching distance, but nothing
+ * pulled the whole cluster inward to fill the empty space between them, so
+ * it settled into a puffy, gap-riddled shape (~25-50% larger than a properly
+ * packed sphere) instead of a dense one.
  */
 function useNucleonLayout(protons, neutrons) {
   return useMemo(() => {
@@ -38,14 +45,19 @@ function useNucleonLayout(protons, neutrons) {
       pos.push([x * startRadius, y * startRadius, z * startRadius]);
     }
 
-    const minDist = NUCLEON_RADIUS * 1.96; // nearly touching, slight gap to avoid z-fighting
-    const iterations = 180;
+    const minDist = NUCLEON_RADIUS * 2.02; // touching, with a hair of gap to avoid z-fighting
+    const attraction = 0.015; // per-nucleon pull toward the centroid — this is what closes the gaps
+    const pushFactor = 0.65;
+    const iterations = 400;
     for (let iter = 0; iter < iterations; iter++) {
       let cx = 0, cy = 0, cz = 0;
       for (const p of pos) { cx += p[0]; cy += p[1]; cz += p[2]; }
       cx /= total; cy /= total; cz /= total;
-      const pull = 0.006;
-      for (const p of pos) { p[0] -= cx * pull; p[1] -= cy * pull; p[2] -= cz * pull; }
+      for (const p of pos) {
+        p[0] -= (p[0] - cx) * attraction;
+        p[1] -= (p[1] - cy) * attraction;
+        p[2] -= (p[2] - cz) * attraction;
+      }
 
       for (let i = 0; i < total; i++) {
         for (let j = i + 1; j < total; j++) {
@@ -53,7 +65,7 @@ function useNucleonLayout(protons, neutrons) {
           let dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
           if (dist < 1e-6) dist = 1e-6;
           if (dist < minDist) {
-            const push = (minDist - dist) * 0.5;
+            const push = (minDist - dist) * pushFactor;
             const nx = dx / dist, ny = dy / dist, nz = dz / dist;
             pos[i][0] -= nx * push; pos[i][1] -= ny * push; pos[i][2] -= nz * push;
             pos[j][0] += nx * push; pos[j][1] += ny * push; pos[j][2] += nz * push;
