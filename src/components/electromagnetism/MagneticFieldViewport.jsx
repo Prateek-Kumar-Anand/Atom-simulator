@@ -3,7 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import { Line } from "@react-three/drei";
 import StageCanvas from "../common/StageCanvas";
 import Label3D from "../common/Label3D";
-import { barMagnetFieldLines } from "../../physics/electromagnetism";
+import { barMagnetFieldLines, wireFieldAt } from "../../physics/electromagnetism";
 
 const SCALE = 0.9;
 
@@ -12,18 +12,18 @@ function BarMagnetGeometry() {
     <group>
       <mesh position={[-0.62, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
         <cylinderGeometry args={[0.55, 0.55, 1.24, 24]} />
-        <meshStandardMaterial color="#5b8def" emissive="#2f4f9e" emissiveIntensity={0.35} roughness={0.35} metalness={0.4} />
+        <meshStandardMaterial color="#3a6fe0" emissive="#2f4f9e" emissiveIntensity={0.35} roughness={0.35} metalness={0.4} />
       </mesh>
       <mesh position={[0.62, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
         <cylinderGeometry args={[0.55, 0.55, 1.24, 24]} />
-        <meshStandardMaterial color="#ef5b6f" emissive="#a52f42" emissiveIntensity={0.35} roughness={0.35} metalness={0.4} />
+        <meshStandardMaterial color="#e23d57" emissive="#a52f42" emissiveIntensity={0.35} roughness={0.35} metalness={0.4} />
       </mesh>
       <mesh rotation={[0, 0, Math.PI / 2]}>
         <cylinderGeometry args={[0.56, 0.56, 0.14, 24]} />
-        <meshStandardMaterial color="#0d131c" roughness={0.6} />
+        <meshStandardMaterial color="#334155" roughness={0.6} />
       </mesh>
-      <Label3D text="S" position={[-1.35, 0, 0.02]} color="#8fb4ff" scale={0.5} />
-      <Label3D text="N" position={[1.35, 0, 0.02]} color="#ff9aa8" scale={0.5} />
+      <Label3D text="S" position={[-1.35, 0, 0.02]} color="#3a6fe0" scale={0.5} />
+      <Label3D text="N" position={[1.35, 0, 0.02]} color="#e23d57" scale={0.5} />
     </group>
   );
 }
@@ -31,7 +31,7 @@ function BarMagnetGeometry() {
 function BarMagnetField({ strength }) {
   const lines = useMemo(() => barMagnetFieldLines(strength, 10), [strength]);
   return lines.map((pts, i) => (
-    <Line key={i} points={pts.map((p) => [p.x * SCALE, p.y * SCALE, 0])} color="#4fd8e0" lineWidth={1.3} transparent opacity={0.7} />
+    <Line key={i} points={pts.map((p) => [p.x * SCALE, p.y * SCALE, 0])} color="#0fa3b8" lineWidth={1.3} transparent opacity={0.7} />
   ));
 }
 
@@ -39,7 +39,7 @@ function WireGeometry({ direction }) {
   return (
     <mesh rotation={[Math.PI / 2, 0, 0]}>
       <cylinderGeometry args={[0.18, 0.18, 7, 20]} />
-      <meshStandardMaterial color="#f2a94e" emissive="#f2a94e" emissiveIntensity={direction > 0 ? 0.5 : 0.15} roughness={0.3} metalness={0.6} />
+      <meshStandardMaterial color="#e08a0b" emissive="#e08a0b" emissiveIntensity={direction > 0 ? 0.5 : 0.15} roughness={0.3} metalness={0.6} />
     </mesh>
   );
 }
@@ -67,7 +67,7 @@ function CurrentFlow({ direction, currentA }) {
       {Array.from({ length: COUNT }, (_, i) => (
         <mesh key={i} ref={(el) => { refs.current[i] = el; }} position={[0, 0, (i / COUNT) * 7 - 3.5]}>
           <sphereGeometry args={[0.09, 10, 10]} />
-          <meshStandardMaterial color="#e8eef5" emissive="#6fe3ea" emissiveIntensity={1.4} />
+          <meshStandardMaterial color="#0e7490" emissive="#0fa3b8" emissiveIntensity={0.9} />
         </mesh>
       ))}
     </group>
@@ -83,7 +83,7 @@ function WireField({ direction }) {
           const a = (i / 64) * Math.PI * 2;
           return [Math.cos(a) * r, Math.sin(a) * r, 0];
         });
-        return <Line key={ri} points={points} color="#4fd8e0" lineWidth={1.2} transparent opacity={0.5} />;
+        return <Line key={ri} points={points} color="#0fa3b8" lineWidth={1.2} transparent opacity={0.5} />;
       })}
       {radii.map((r, ri) => (
         <group key={"arrows" + ri}>
@@ -94,7 +94,7 @@ function WireField({ direction }) {
             return (
               <mesh key={i} position={[x, y, 0]} rotation={[0, 0, tangent]}>
                 <coneGeometry args={[0.12, 0.3, 8]} />
-                <meshStandardMaterial color="#6bd68a" emissive="#6bd68a" emissiveIntensity={0.6} />
+                <meshStandardMaterial color="#22a35a" emissive="#22a35a" emissiveIntensity={0.6} />
               </mesh>
             );
           })}
@@ -111,12 +111,12 @@ function SolenoidGeometry({ turns = 14 }) {
       {coils.map((z, i) => (
         <mesh key={i} position={[0, z, 0]} rotation={[Math.PI / 2, 0, 0]}>
           <torusGeometry args={[1.1, 0.07, 12, 36]} />
-          <meshStandardMaterial color="#f2a94e" emissive="#f2a94e" emissiveIntensity={0.3} roughness={0.3} metalness={0.75} />
+          <meshStandardMaterial color="#e08a0b" emissive="#e08a0b" emissiveIntensity={0.3} roughness={0.3} metalness={0.75} />
         </mesh>
       ))}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <cylinderGeometry args={[1.02, 1.02, 5.6, 24, 1, true]} />
-        <meshStandardMaterial color="#4fd8e0" transparent opacity={0.06} side={2} />
+        <meshStandardMaterial color="#0fa3b8" transparent opacity={0.06} side={2} />
       </mesh>
     </group>
   );
@@ -127,19 +127,19 @@ function SolenoidField({ direction }) {
   const poleX = 3.15 * direction;
   return (
     <group>
-      {insideLines.map((pts, i) => <Line key={i} points={pts} color="#4fd8e0" lineWidth={2} />)}
+      {insideLines.map((pts, i) => <Line key={i} points={pts} color="#0fa3b8" lineWidth={2} />)}
       {insideLines.map((pts, i) => (
         <mesh key={"h" + i} position={pts[1]} rotation={[0, 0, direction > 0 ? -Math.PI / 2 : Math.PI / 2]}>
           <coneGeometry args={[0.13, 0.32, 8]} />
-          <meshStandardMaterial color="#6bd68a" emissive="#6bd68a" emissiveIntensity={0.6} />
+          <meshStandardMaterial color="#22a35a" emissive="#22a35a" emissiveIntensity={0.6} />
         </mesh>
       ))}
       {/* Approximate external return-path loops, bar-magnet style */}
       {barMagnetFieldLines(6, 5).map((pts, i) => (
-        <Line key={"ext" + i} points={pts.map((p) => [p.x * direction * 0.7, p.y * 0.9, 0])} color="#4fd8e0" lineWidth={1} transparent opacity={0.35} />
+        <Line key={"ext" + i} points={pts.map((p) => [p.x * direction * 0.7, p.y * 0.9, 0])} color="#0fa3b8" lineWidth={1} transparent opacity={0.35} />
       ))}
-      <Label3D text="N" position={[poleX, 0, 1.05]} color="#ff9aa8" scale={0.5} />
-      <Label3D text="S" position={[-poleX, 0, 1.05]} color="#8fb4ff" scale={0.5} />
+      <Label3D text="N" position={[poleX, 0, 1.05]} color="#e23d57" scale={0.5} />
+      <Label3D text="S" position={[-poleX, 0, 1.05]} color="#3a6fe0" scale={0.5} />
     </group>
   );
 }
@@ -157,16 +157,16 @@ function Compass({ probe, fieldDir, mag, maxMag, setDragging }) {
     >
       <mesh>
         <ringGeometry args={[0.32, 0.4, 28]} />
-        <meshBasicMaterial color="#e8eef5" transparent opacity={0.5} />
+        <meshBasicMaterial color="#1e293b" transparent opacity={0.5} />
       </mesh>
       <group rotation={[0, 0, angle]}>
         <mesh position={[len / 2, 0, 0]}>
           <boxGeometry args={[len, 0.05, 0.05]} />
-          <meshStandardMaterial color="#6bd68a" emissive="#6bd68a" emissiveIntensity={0.9} />
+          <meshStandardMaterial color="#22a35a" emissive="#22a35a" emissiveIntensity={0.9} />
         </mesh>
         <mesh position={[len, 0, 0]} rotation={[0, 0, -Math.PI / 2]}>
           <coneGeometry args={[0.11, 0.22, 10]} />
-          <meshStandardMaterial color="#6bd68a" emissive="#6bd68a" emissiveIntensity={0.9} />
+          <meshStandardMaterial color="#22a35a" emissive="#22a35a" emissiveIntensity={0.9} />
         </mesh>
       </group>
     </group>
@@ -189,7 +189,9 @@ function CompassDragPlane({ dragging, onDrag, setDragging }) {
 export default function MagneticFieldViewport({ source, strength, currentA, direction, probe, onDragProbe, probeField }) {
   const [dragging, setDragging] = useState(false);
   const showCompass = (source === "bar" || source === "wire") && probeField;
-  const maxMag = source === "wire" ? Math.max(1e-9, probeField?.mag || 1) * 1.4 : 8;
+  // Fixed reference for the compass-needle length. (It used to be derived from the probe's own field,
+  // so the ratio was constant and the needle never changed length as it was dragged away from the wire.)
+  const maxMag = source === "wire" ? Math.max(1e-12, wireFieldAt(currentA, 1, 0).mag) : 8;
 
   return (
     <StageCanvas cameraDistance={11} minDistance={5} maxDistance={22} autoRotateSpeed={dragging ? 0 : 0.35} controlsEnabled={!dragging}>

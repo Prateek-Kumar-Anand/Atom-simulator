@@ -19,7 +19,8 @@ export default function SpectrumLab() {
 
   const element = getFullElementByZ(Z);
   const t = useMemo(() => computeTransition(ni, nf, Z), [ni, nf, Z]);
-  const color = t.visible ? wavelengthToColor(t.wavelengthNm) : "#5b6472";
+  const same = ni === nf; // no transition: ΔE = 0, so wavelength/frequency are undefined (not "Infinity")
+  const color = !same && t.visible ? wavelengthToColor(t.wavelengthNm) : "#94a3b8";
 
   return (
     <div className="qp-lab-grid">
@@ -45,7 +46,7 @@ export default function SpectrumLab() {
         <div className="qp-card">
           <h4>Visible spectrum position</h4>
           <div className="qp-spectrum-bar">
-            {t.visible && (
+            {!same && t.visible && (
               <div className="qp-spectrum-marker" style={{ left: `${((t.wavelengthNm - 380) / 400) * 100}%`, background: color }} />
             )}
           </div>
@@ -70,16 +71,18 @@ export default function SpectrumLab() {
         <div className="qp-card">
           <h4>Results</h4>
           <div className="qp-readout-grid">
-            <Readout label="Ion" value={`${element.symbol}${Z > 1 ? `${Z - 1}+` : ""} (Z=${Z})`} accent="#c084fc" />
+            <Readout label="Ion" value={`${element.symbol}${Z > 1 ? `${Z - 1}+` : ""} (Z=${Z})`} accent="#9b59e6" />
             <Readout label="Transition" value={ni === nf ? "—" : `n=${ni} → n=${nf}`} />
-            <Readout label="Series" value={t.series} />
-            <Readout label="ΔE" value={`${fmt(t.dE)} eV`} accent="#f2a94e" />
-            <Readout label="Wavelength (λ)" value={`${fmt(t.wavelengthNm)} nm`} accent={color} />
-            <Readout label="Frequency" value={`${fmt(t.frequencyHz / 1e14)}×10¹⁴ Hz`} />
-            <Readout label="In visible range?" value={t.visible ? "Yes" : "No (UV/IR)"} />
+            <Readout label="Series" value={same ? "—" : t.series} />
+            <Readout label="ΔE" value={same ? "—" : `${fmt(t.dE)} eV`} accent="#e08a0b" />
+            <Readout label="Wavelength (λ)" value={same ? "—" : `${fmt(t.wavelengthNm)} nm`} accent={color} />
+            <Readout label="Frequency" value={same ? "—" : `${fmt(t.frequencyHz / 1e14)}×10¹⁴ Hz`} />
+            <Readout label="In visible range?" value={same ? "—" : t.visible ? "Yes" : "No (UV/IR)"} />
           </div>
+          {same && <p className="qp-muted small" style={{ margin: "0 0 10px" }}>Choose two different levels to see a transition.</p>}
           <button
             className="qp-btn"
+            disabled={same}
             onClick={() => log("Hydrogen Spectrum", `${element.symbol}${Z > 1 ? `${Z - 1}+` : ""}, n=${ni}→n=${nf}`, `ΔE=${fmt(t.dE)} eV, λ=${fmt(t.wavelengthNm)} nm, ${t.series}`)}
           >
             Record result

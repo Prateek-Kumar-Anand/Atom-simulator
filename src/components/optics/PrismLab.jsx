@@ -57,7 +57,7 @@ export default function PrismLab() {
           <PrismViewport geometryBase={geometryBase} rays={rays} mode={mode} />
         </HUD>
         {tirCount > 0 && (
-          <p className="qp-instructions" style={{ color: "#ef5b6f" }}>
+          <p className="qp-instructions" style={{ color: "#e23d57" }}>
             <AlertTriangle size={14} /> {tirCount} of {rays.length} rays undergo total internal
             reflection at this angle and never emerge — try a smaller incidence or apex angle.
           </p>
@@ -99,16 +99,16 @@ export default function PrismLab() {
         <div className="qp-card">
           <h4>n(λ) = A + B/λ² · δ = θ₁ + θ₂ − A</h4>
           <div className="qp-readout-grid">
-            <Readout label={`n at ${REF_NM}nm (sodium D)`} value={fmt(nRef, 4)} accent="#4fd8e0" />
+            <Readout label={`n at ${REF_NM}nm (sodium D)`} value={fmt(nRef, 4)} accent="#0fa3b8" />
             <Readout
               label="Deviation δ (ref. λ)"
               value={refRay.tir ? "TIR — no exit ray" : `${fmt(refRay.deviationDeg, 2)}°`}
-              accent={refRay.tir ? "#ef5b6f" : "#f2a94e"}
+              accent={refRay.tir ? "#e23d57" : "#e08a0b"}
             />
             <Readout label="Minimum deviation δmin" value={deltaMin != null ? `${fmt(deltaMin, 2)}°` : "—"} />
             <Readout label="Critical angle (internal)" value={criticalAngleDeg != null ? `${fmt(criticalAngleDeg, 2)}°` : "—"} />
             {angularDispersion != null && (
-              <Readout label="Angular dispersion (violet − red)" value={`${fmt(angularDispersion, 2)}°`} accent="#c084fc" />
+              <Readout label="Angular dispersion (violet − red)" value={`${fmt(angularDispersion, 2)}°`} accent="#9b59e6" />
             )}
           </div>
           <button

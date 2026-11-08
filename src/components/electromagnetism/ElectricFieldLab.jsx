@@ -95,7 +95,7 @@ export default function ElectricFieldLab() {
           </p>
           <FullElementPicker selectedZ={ionZ} onSelect={setIonZ} />
           <div className="qp-readout-grid" style={{ marginTop: 10 }}>
-            <Readout label={`${ion.name} (Z=${ion.Z})`} value={`Q = +${ion.Z}e`} accent="#ef5b6f" />
+            <Readout label={`${ion.name} (Z=${ion.Z})`} value={`Q = +${ion.Z}e`} accent="#e23d57" />
             <Readout label="Nuclear charge" value={`${fmt(ion.Z * 1.602176634e-19 * 1e9, 3)} nC`} />
           </div>
         </div>
@@ -103,15 +103,15 @@ export default function ElectricFieldLab() {
         <div className="qp-card">
           <h4>Probe readout — E = kQ/r², V = kQ/r</h4>
           <div className="qp-readout-grid">
-            <Readout label="Field magnitude |E|" value={`${fmt(field.mag, 3)} N/C`} accent="#4fd8e0" />
-            <Readout label="Potential V" value={`${fmt(field.V, 3)} V`} accent="#f2a94e" />
+            <Readout label="Field magnitude |E|" value={`${fmt(field.mag, 3)} N/C`} accent="#0fa3b8" />
+            <Readout label="Potential V" value={`${fmt(field.V, 3)} V`} accent="#e08a0b" />
             <Readout label="Ex" value={`${fmt(field.Ex, 3)} N/C`} />
             <Readout label="Ey" value={`${fmt(field.Ey, 3)} N/C`} />
           </div>
           {pairSeparation && (
             <div className="qp-readout-grid">
               <Readout label="Separation r" value={`${(pairSeparation * 100).toFixed(2)} cm`} />
-              <Readout label="Coulomb force F = kQ₁Q₂/r²" value={`${fmt(pairForce, 4)} N`} accent="#c084fc" />
+              <Readout label="Coulomb force F = kQ₁Q₂/r²" value={`${fmt(pairForce, 4)} N`} accent="#9b59e6" />
             </div>
           )}
           <button

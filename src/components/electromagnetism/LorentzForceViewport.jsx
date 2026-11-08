@@ -3,14 +3,14 @@ import { useFrame } from "@react-three/fiber";
 import { Line, Trail } from "@react-three/drei";
 import StageCanvas from "../common/StageCanvas";
 
-const WORLD_SCALE = 1; // trajectory is already computed in meter-scale units that fit the viewport
 const BOX = 4; // half-extent of the field region cube
+const FIT = 0.85; // the path is scaled so its largest extent fills this fraction of the box
 
 function FieldRegionBox() {
   return (
     <mesh>
       <boxGeometry args={[BOX * 2, BOX * 2, BOX * 2]} />
-      <meshStandardMaterial color="#1f2b3a" wireframe transparent opacity={0.35} />
+      <meshStandardMaterial color="#64748b" wireframe transparent opacity={0.45} />
     </mesh>
   );
 }
@@ -31,7 +31,7 @@ function BFieldGlyphs({ bz }) {
     }
   }
   if (Math.abs(bz) < 1e-9) return null;
-  const color = "#f2a94e";
+  const color = "#e08a0b";
   return (
     <group>
       {glyphs.map(([x, y], idx) => (
@@ -72,10 +72,10 @@ function EFieldArrows({ ey }) {
         const y1 = up ? len / 2 : -len / 2;
         return (
           <group key={i} position={[x, 0, -BOX * 0.85]}>
-            <Line points={[[0, y0, 0], [0, y1, 0]]} color="#c084fc" lineWidth={1.6} transparent opacity={0.6} />
+            <Line points={[[0, y0, 0], [0, y1, 0]]} color="#9b59e6" lineWidth={1.6} transparent opacity={0.6} />
             <mesh position={[0, y1, 0]} rotation={[0, 0, up ? 0 : Math.PI]}>
               <coneGeometry args={[0.09, 0.22, 8]} />
-              <meshStandardMaterial color="#c084fc" emissive="#c084fc" emissiveIntensity={0.7} />
+              <meshStandardMaterial color="#9b59e6" emissive="#9b59e6" emissiveIntensity={0.7} />
             </mesh>
           </group>
         );
@@ -113,11 +113,16 @@ function MovingParticle({ points, color }) {
 }
 
 export default function LorentzForceViewport({ trajectoryPoints, particleCharge, bz = 0, ey = 0 }) {
-  const points = useMemo(
-    () => trajectoryPoints.map((p) => [p.x * WORLD_SCALE, p.y * WORLD_SCALE, p.z * WORLD_SCALE]),
-    [trajectoryPoints]
-  );
-  const color = particleCharge >= 0 ? "#ef5b6f" : "#5b8def";
+  // The physical orbit radius ranges from ~0.1 m to tens of metres across the sliders, so a fixed
+  // world scale left the path either a dot or flying out of the view after a few points. Normalise
+  // the path to the box instead; the true radius is shown in the readouts.
+  const points = useMemo(() => {
+    let extent = 0;
+    for (const p of trajectoryPoints) extent = Math.max(extent, Math.abs(p.x), Math.abs(p.y), Math.abs(p.z));
+    const s = extent > 0 ? (BOX * FIT) / extent : 1;
+    return trajectoryPoints.map((p) => [p.x * s, p.y * s, p.z * s]);
+  }, [trajectoryPoints]);
+  const color = particleCharge >= 0 ? "#e23d57" : "#3a6fe0";
 
   return (
     <StageCanvas cameraDistance={9} minDistance={4} maxDistance={20} autoRotateSpeed={0.25}>

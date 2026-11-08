@@ -7,13 +7,21 @@ import Readout from "../common/Readout";
 import { tunnelingProbability, sampleTunnelingCurve } from "../../physics/quantum";
 import { fmt } from "../../physics/constants";
 import { useApp } from "../../context/AppContext";
+import { CHART, TOOLTIP_STYLE, xAxisLabel } from "../common/chartTheme";
 
 const CANVAS_W = 640, CANVAS_H = 200;
 const BARRIER_X0 = CANVAS_W * 0.42, BARRIER_X1_MAX = CANVAS_W * 0.62;
+const PAD_Y = 20;
+const E_AXIS_FACTOR = 1.6; // energy axis spans 0 .. 1.6·V₀ (same range as the T(E) chart and the E slider)
+const PARTICLE_SPEED = 90; // px / s
+const SPAWN_EVERY_MS = 260;
 const MASS_PRESETS = [
   { key: "electron", label: "Electron", ratio: 1 },
   { key: "proton", label: "Proton", ratio: 1836 },
 ];
+
+// The detector canvas is an "instrument screen": it stays dark so the coloured particles read clearly.
+const SCREEN_BG = "#141c2e";
 
 export default function TunnelingLab() {
   const { log } = useApp();
@@ -33,28 +41,40 @@ export default function TunnelingLab() {
   const barrierWidthPx = Math.min(BARRIER_X1_MAX - BARRIER_X0, Math.max(14, L * 60));
   const barrierX1 = BARRIER_X0 + barrierWidthPx;
 
-  // Changing the physical setup starts a fresh experiment (old empirical tally no longer applies).
+  // The animation loop reads the latest physics through a ref, so it keeps running smoothly while
+  // sliders move instead of being torn down and restarted on every value change.
+  const live = useRef({ T, barrierX1, V0, E });
+  live.current = { T, barrierX1, V0, E };
+
+  // Any change to the physical setup (including the particle energy E, which sets T) starts a fresh
+  // experiment — otherwise the empirical tally would mix results taken at different probabilities.
   useEffect(() => {
     particlesRef.current = [];
     setCounts({ transmitted: 0, reflected: 0 });
-  }, [V0, L, mass.ratio]);
+  }, [V0, E, L, mass.ratio]);
 
   useEffect(() => {
     let raf;
     let lastSpawn = 0;
+    let lastTime = null;
     const ctx = canvasRef.current?.getContext("2d");
+    const yForEnergy = (energy, v0) => CANVAS_H - PAD_Y - (energy / (v0 * E_AXIS_FACTOR)) * (CANVAS_H - 2 * PAD_Y);
 
     function draw(time) {
+      const { T: prob, barrierX1: bx1, V0: v0, E: energy } = live.current;
+      // Real elapsed time (capped), so speed doesn't double on 120 Hz displays or stall in background tabs.
+      const dt = lastTime === null ? 0 : Math.min(0.05, (time - lastTime) / 1000);
+      lastTime = time;
+
       if (playing) {
-        if (time - lastSpawn > 260) {
+        if (time - lastSpawn > SPAWN_EVERY_MS) {
           lastSpawn = time;
-          particlesRef.current.push({ x: 10, vx: 90, status: "incoming", resolved: false });
+          particlesRef.current.push({ x: 10, vx: PARTICLE_SPEED, status: "incoming", resolved: false });
         }
-        const dt = 1 / 60;
         particlesRef.current.forEach((p) => {
           if (p.status === "incoming" && p.x >= BARRIER_X0 && !p.resolved) {
             p.resolved = true;
-            const success = Math.random() < T;
+            const success = Math.random() < prob;
             p.status = success ? "transmitted" : "reflected";
             setCounts((c) => (success ? { ...c, transmitted: c.transmitted + 1 } : { ...c, reflected: c.reflected + 1 }));
             if (!success) p.vx = -p.vx;
@@ -65,24 +85,34 @@ export default function TunnelingLab() {
       }
 
       if (ctx) {
-        ctx.fillStyle = "#05070c";
+        ctx.fillStyle = SCREEN_BG;
         ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
-        // barrier
-        ctx.fillStyle = "rgba(239,91,111,0.18)";
-        ctx.fillRect(BARRIER_X0, 20, barrierX1 - BARRIER_X0, CANVAS_H - 40);
-        ctx.strokeStyle = "#ef5b6f";
-        ctx.strokeRect(BARRIER_X0, 20, barrierX1 - BARRIER_X0, CANVAS_H - 40);
-        // energy level line for the incoming particle
-        const eY = CANVAS_H - 20 - (E / (V0 * 1.6)) * (CANVAS_H - 40);
+        const floorY = CANVAS_H - PAD_Y;
+        const topY = yForEnergy(v0, v0); // the barrier is drawn up to its true height V₀
+        ctx.strokeStyle = "rgba(255,255,255,0.18)";
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(CANVAS_W, floorY); ctx.stroke();
+        // barrier (height = V₀)
+        ctx.fillStyle = "rgba(255,107,129,0.26)";
+        ctx.fillRect(BARRIER_X0, topY, bx1 - BARRIER_X0, floorY - topY);
+        ctx.strokeStyle = "#ff6b81";
+        ctx.strokeRect(BARRIER_X0, topY, bx1 - BARRIER_X0, floorY - topY);
+        ctx.fillStyle = "#ff9aa8";
+        ctx.font = "11px 'IBM Plex Mono', monospace";
+        ctx.fillText("V₀", BARRIER_X0 + 4, topY - 5);
+        // particle energy level
+        const eY = yForEnergy(energy, v0);
         ctx.strokeStyle = "#4fd8e0";
         ctx.setLineDash([4, 4]);
         ctx.beginPath(); ctx.moveTo(0, eY); ctx.lineTo(CANVAS_W, eY); ctx.stroke();
         ctx.setLineDash([]);
-        // particles
+        ctx.fillStyle = "#4fd8e0";
+        ctx.fillText("E", 6, eY - 5);
+        // particles travel along their own energy level
         particlesRef.current.forEach((p) => {
-          ctx.fillStyle = p.status === "reflected" ? "#f2a94e" : p.status === "transmitted" ? "#6bd68a" : "#c084fc";
+          ctx.fillStyle = p.status === "reflected" ? "#ffb44d" : p.status === "transmitted" ? "#5be39a" : "#c4a1ff";
           ctx.beginPath();
-          ctx.arc(p.x, CANVAS_H / 2, 5, 0, Math.PI * 2);
+          ctx.arc(p.x, eY, 5, 0, Math.PI * 2);
           ctx.fill();
         });
       }
@@ -90,37 +120,43 @@ export default function TunnelingLab() {
     }
     raf = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(raf);
-  }, [playing, T, barrierX1, V0, E]);
+  }, [playing]);
 
   const reset = () => { particlesRef.current = []; setCounts({ transmitted: 0, reflected: 0 }); };
   const totalShots = counts.transmitted + counts.reflected;
   const empiricalT = totalShots > 0 ? counts.transmitted / totalShots : 0;
+  const eMax = V0 * E_AXIS_FACTOR;
 
   return (
     <div className="qp-lab-grid">
       <div className="qp-main-col">
         <p className="qp-instructions">
-          <Info size={14} /> Each particle (violet) has energy E, shown by the dashed line, below the
-          barrier height V₀ — classically it could never cross. Quantum mechanically it sometimes
-          does anyway (green = transmitted, amber = reflected).
+          <Info size={14} /> Each particle (violet) travels along its energy level E (dashed line). The
+          red block is the barrier, drawn up to its height V₀ — while E is below it, the particle could
+          never cross classically. Quantum mechanically it sometimes does anyway (green = transmitted,
+          amber = reflected).
         </p>
         <div className="qp-card">
           <h4>Barrier approach</h4>
           <canvas
-            ref={canvasRef} width={CANVAS_W} height={CANVAS_H}
-            style={{ width: "100%", height: 180, borderRadius: 8, background: "#05070c", border: "1px solid var(--border)" }}
+            ref={canvasRef} width={CANVAS_W} height={CANVAS_H} className="qp-screen"
+            style={{ width: "100%", height: 180 }}
+            role="img" aria-label="Particles approaching a potential barrier"
           />
         </div>
         <div className="qp-card">
           <h4>Transmission probability T(E)</h4>
           <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={curve.map((p) => ({ E: Number(p.E.toFixed(2)), T: p.T }))}>
-              <CartesianGrid stroke="#1f2b3a" />
-              <XAxis dataKey="E" stroke="#7c8a9c" tick={{ fontSize: 10 }} label={{ value: "Energy E (eV)", position: "insideBottom", offset: -4, fill: "#7c8a9c", fontSize: 10 }} />
-              <YAxis domain={[0, 1]} stroke="#7c8a9c" tick={{ fontSize: 10 }} width={30} />
-              <Tooltip contentStyle={{ background: "#0d131c", border: "1px solid #1f2b3a", fontSize: 12 }} />
-              <Line type="monotone" dataKey="T" stroke="#4fd8e0" dot={false} strokeWidth={2} />
-              <ReferenceDot x={Number(E.toFixed(2))} y={T} r={5} fill="#c084fc" stroke="#0d131c" strokeWidth={2} />
+            <LineChart data={curve} margin={{ top: 8, right: 14, left: 0, bottom: 6 }}>
+              <CartesianGrid stroke={CHART.grid} strokeDasharray="3 3" />
+              <XAxis
+                dataKey="E" type="number" domain={[0, eMax]} tickFormatter={(v) => Number(v).toFixed(1)}
+                stroke={CHART.axis} tick={CHART.tick} label={xAxisLabel("Energy E (eV)")}
+              />
+              <YAxis domain={[0, 1]} stroke={CHART.axis} tick={CHART.tick} width={30} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v) => [Number(v).toFixed(4), "T"]} labelFormatter={(v) => `E = ${Number(v).toFixed(2)} eV`} />
+              <Line type="monotone" dataKey="T" stroke="#0fa3b8" dot={false} strokeWidth={2} isAnimationActive={false} />
+              <ReferenceDot x={E} y={T} r={5} fill="#9b59e6" stroke="#ffffff" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -136,11 +172,18 @@ export default function TunnelingLab() {
           </div>
           <div className="qp-slider-row">
             <label>Particle energy E = {E.toFixed(2)} eV</label>
-            <input type="range" min={0.1} max={V0 * 1.6} step={0.05} value={E} className="qp-slider" onChange={(e) => setE(Number(e.target.value))} />
+            <input type="range" min={0.1} max={eMax} step={0.05} value={Math.min(E, eMax)} className="qp-slider" onChange={(e) => setE(Number(e.target.value))} />
           </div>
           <div className="qp-slider-row">
             <label>Barrier height V₀ = {V0.toFixed(1)} eV</label>
-            <input type="range" min={1} max={15} step={0.5} value={V0} className="qp-slider" onChange={(e) => setV0(Number(e.target.value))} />
+            <input
+              type="range" min={1} max={15} step={0.5} value={V0} className="qp-slider"
+              onChange={(e) => {
+                const v = Number(e.target.value);
+                setV0(v);
+                setE((cur) => Math.min(cur, v * E_AXIS_FACTOR)); // keep E inside the slider's new range
+              }}
+            />
           </div>
           <div className="qp-slider-row">
             <label>Barrier width L = {L.toFixed(2)} nm</label>
@@ -156,10 +199,10 @@ export default function TunnelingLab() {
         <div className="qp-card">
           <h4>Results</h4>
           <div className="qp-readout-grid">
-            <Readout label="Theoretical T" value={fmt(T, 4)} accent="#4fd8e0" />
+            <Readout label="Theoretical T" value={fmt(T, 4)} accent="#0fa3b8" />
             <Readout label="Empirical T (this run)" value={totalShots > 0 ? fmt(empiricalT, 3) : "—"} />
-            <Readout label="Transmitted" value={counts.transmitted} accent="#6bd68a" />
-            <Readout label="Reflected" value={counts.reflected} accent="#f2a94e" />
+            <Readout label="Transmitted" value={counts.transmitted} accent="#22a35a" />
+            <Readout label="Reflected" value={counts.reflected} accent="#e08a0b" />
           </div>
           <button
             className="qp-btn"

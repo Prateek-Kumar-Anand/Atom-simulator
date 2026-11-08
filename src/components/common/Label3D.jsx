@@ -34,7 +34,7 @@ function makeLabelTexture(text, color) {
   return texture;
 }
 
-export default function Label3D({ text, position, color = "#e8eef5", scale = 0.6 }) {
+export default function Label3D({ text, position, color = "#1e293b", scale = 0.6 }) {
   const texture = useMemo(() => makeLabelTexture(text, color), [text, color]);
   return (
     <sprite position={position} scale={[scale, scale, scale]}>

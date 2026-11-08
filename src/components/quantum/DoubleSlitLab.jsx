@@ -7,9 +7,12 @@ import Readout from "../common/Readout";
 import { sampleDoubleSlitPattern, drawDoubleSlitHit } from "../../physics/quantum";
 import { wavelengthToColor, fmt } from "../../physics/constants";
 import { useApp } from "../../context/AppContext";
+import { CHART, TOOLTIP_STYLE, xAxisLabel } from "../common/chartTheme";
 
 const HALF_RANGE_M = 0.06; // screen shown from -6cm to +6cm around center
 const CANVAS_W = 640, CANVAS_H = 260;
+const SLIT_GAP_UM = 4; // minimum wall thickness between the two slits (slits may not overlap: a < d)
+const SCREEN_BG = "#141c2e"; // detector screens stay dark so the coloured hits are visible
 
 export default function DoubleSlitLab() {
   const { log } = useApp();
@@ -22,7 +25,7 @@ export default function DoubleSlitLab() {
   const [hitCount, setHitCount] = useState(0);
 
   const canvasRef = useRef(null);
-  const hitsRef = useRef([]);
+  const countRef = useRef(0);
 
   const params = { wavelengthNm, slitSeparationUm, slitWidthUm, screenDistanceM, whichPathKnown };
   const beamColor = wavelengthToColor(wavelengthNm);
@@ -32,33 +35,37 @@ export default function DoubleSlitLab() {
     [wavelengthNm, slitSeparationUm, slitWidthUm, screenDistanceM, whichPathKnown]);
 
   const chartData = useMemo(
-    () => distribution.pts.map((p) => ({ mm: Math.round(p.y * 1000), I: p.I })),
+    () => distribution.pts.map((p) => ({ mm: Number((p.y * 1000).toFixed(2)), I: p.I })),
     [distribution]
   );
 
-  // Reset the accumulated screen whenever the physical setup changes (a new experiment).
-  useEffect(() => {
-    hitsRef.current = [];
+  const clearScreen = () => {
+    countRef.current = 0;
     setHitCount(0);
     const ctx = canvasRef.current?.getContext("2d");
-    if (ctx) { ctx.fillStyle = "#05070c"; ctx.fillRect(0, 0, CANVAS_W, CANVAS_H); }
+    if (ctx) { ctx.fillStyle = SCREEN_BG; ctx.fillRect(0, 0, CANVAS_W, CANVAS_H); }
+  };
+
+  // Reset the accumulated screen whenever the physical setup changes (a new experiment).
+  useEffect(() => {
+    clearScreen();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wavelengthNm, slitSeparationUm, slitWidthUm, screenDistanceM, whichPathKnown]);
 
+  // Particle detection runs ~80×/s and paints straight onto the canvas; only the on-screen counter is
+  // React state, refreshed a few times per second. (Previously every single hit re-rendered the whole
+  // lab — including the chart — ~80 times a second.)
   useEffect(() => {
     if (!playing) return undefined;
     const id = setInterval(() => {
       const y = drawDoubleSlitHit(distribution);
-      hitsRef.current.push(y);
-      if (hitsRef.current.length > 4000) hitsRef.current.shift();
-      setHitCount((c) => c + 1);
-
+      countRef.current += 1;
       const ctx = canvasRef.current?.getContext("2d");
       if (ctx) {
         const px = CANVAS_W / 2 + (y / HALF_RANGE_M) * (CANVAS_W / 2 - 10);
         const py = CANVAS_H / 2 + (Math.random() - 0.5) * (CANVAS_H - 20);
         ctx.fillStyle = beamColor;
-        ctx.globalAlpha = 0.55;
+        ctx.globalAlpha = 0.6;
         ctx.beginPath();
         ctx.arc(px, py, 1.4, 0, Math.PI * 2);
         ctx.fill();
@@ -68,12 +75,10 @@ export default function DoubleSlitLab() {
     return () => clearInterval(id);
   }, [playing, distribution, beamColor]);
 
-  const reset = () => {
-    hitsRef.current = [];
-    setHitCount(0);
-    const ctx = canvasRef.current?.getContext("2d");
-    if (ctx) { ctx.fillStyle = "#05070c"; ctx.fillRect(0, 0, CANVAS_W, CANVAS_H); }
-  };
+  useEffect(() => {
+    const id = setInterval(() => setHitCount((c) => (c === countRef.current ? c : countRef.current)), 150);
+    return () => clearInterval(id);
+  }, []);
 
   return (
     <div className="qp-lab-grid">
@@ -86,19 +91,24 @@ export default function DoubleSlitLab() {
         <div className="qp-card">
           <h4>Detector screen ({hitCount.toLocaleString()} particles detected)</h4>
           <canvas
-            ref={canvasRef} width={CANVAS_W} height={CANVAS_H}
-            style={{ width: "100%", height: 220, borderRadius: 8, background: "#05070c", border: "1px solid var(--border)" }}
+            ref={canvasRef} width={CANVAS_W} height={CANVAS_H} className="qp-screen"
+            style={{ width: "100%", height: 220 }}
+            role="img" aria-label="Detector screen showing accumulated particle hits"
           />
         </div>
         <div className="qp-card">
           <h4>Probability distribution (theoretical intensity)</h4>
           <ResponsiveContainer width="100%" height={180}>
-            <AreaChart data={chartData}>
-              <CartesianGrid stroke="#1f2b3a" />
-              <XAxis dataKey="mm" stroke="#7c8a9c" tick={{ fontSize: 10 }} label={{ value: "Screen position (mm)", position: "insideBottom", offset: -4, fill: "#7c8a9c", fontSize: 10 }} />
-              <YAxis stroke="#7c8a9c" tick={{ fontSize: 10 }} width={30} />
-              <Tooltip contentStyle={{ background: "#0d131c", border: "1px solid #1f2b3a", fontSize: 12 }} />
-              <Area type="monotone" dataKey="I" stroke={beamColor} fill={beamColor} fillOpacity={0.25} strokeWidth={2} />
+            <AreaChart data={chartData} margin={{ top: 6, right: 14, left: 0, bottom: 6 }}>
+              <CartesianGrid stroke={CHART.grid} strokeDasharray="3 3" />
+              <XAxis
+                dataKey="mm" type="number" domain={[-HALF_RANGE_M * 1000, HALF_RANGE_M * 1000]}
+                tickFormatter={(v) => Math.round(v)} stroke={CHART.axis} tick={CHART.tick}
+                label={xAxisLabel("Screen position (mm)")}
+              />
+              <YAxis stroke={CHART.axis} tick={CHART.tick} width={30} tickFormatter={(v) => Number(v).toFixed(1)} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v) => [Number(v).toFixed(3), "Intensity"]} labelFormatter={(v) => `y = ${Number(v).toFixed(1)} mm`} />
+              <Area type="monotone" dataKey="I" stroke={beamColor} fill={beamColor} fillOpacity={0.25} strokeWidth={2} isAnimationActive={false} />
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -120,11 +130,17 @@ export default function DoubleSlitLab() {
           </div>
           <div className="qp-slider-row">
             <label>Slit separation d = {slitSeparationUm} μm</label>
-            <input type="range" min={20} max={150} step={2} value={slitSeparationUm} className="qp-slider" onChange={(e) => setSlitSeparationUm(Number(e.target.value))} />
+            <input
+              type="range" min={Math.max(20, slitWidthUm + SLIT_GAP_UM)} max={150} step={2}
+              value={slitSeparationUm} className="qp-slider" onChange={(e) => setSlitSeparationUm(Number(e.target.value))}
+            />
           </div>
           <div className="qp-slider-row">
-            <label>Slit width a = {slitWidthUm} μm</label>
-            <input type="range" min={4} max={40} step={1} value={slitWidthUm} className="qp-slider" onChange={(e) => setSlitWidthUm(Number(e.target.value))} />
+            <label>Slit width a = {slitWidthUm} μm <span className="qp-muted">(must stay below d)</span></label>
+            <input
+              type="range" min={4} max={Math.min(40, slitSeparationUm - SLIT_GAP_UM)} step={1}
+              value={slitWidthUm} className="qp-slider" onChange={(e) => setSlitWidthUm(Number(e.target.value))}
+            />
           </div>
           <div className="qp-slider-row">
             <label>Screen distance L = {screenDistanceM.toFixed(1)} m</label>
@@ -134,18 +150,18 @@ export default function DoubleSlitLab() {
             <button className="qp-btn qp-btn-primary" onClick={() => setPlaying((p) => !p)}>
               {playing ? <Pause size={14} /> : <Play size={14} />} {playing ? "Pause" : "Resume"}
             </button>
-            <button className="qp-btn" onClick={reset}><RotateCcw size={14} /> Clear screen</button>
+            <button className="qp-btn" onClick={clearScreen}><RotateCcw size={14} /> Clear screen</button>
           </div>
         </div>
         <div className="qp-card">
           <h4>Results</h4>
           <div className="qp-readout-grid">
-            <Readout label="Fringe spacing (≈λL/d)" value={`${fmt((wavelengthNm * 1e-9 * screenDistanceM / (slitSeparationUm * 1e-6)) * 1000, 2)} mm`} accent="#4fd8e0" />
+            <Readout label="Fringe spacing (≈λL/d)" value={`${fmt((wavelengthNm * 1e-9 * screenDistanceM / (slitSeparationUm * 1e-6)) * 1000, 2)} mm`} accent="#0fa3b8" />
             <Readout label="Particles detected" value={hitCount.toLocaleString()} />
           </div>
           <button
             className="qp-btn"
-            onClick={() => log("Quantum: Double Slit", `${whichPathKnown ? "Which-path known" : "Wave-like"}, λ=${wavelengthNm}nm`, `${hitCount} particles detected, d=${slitSeparationUm}μm, a=${slitWidthUm}μm`)}
+            onClick={() => log("Quantum: Double Slit", `${whichPathKnown ? "Which-path known" : "Wave-like"}, λ=${wavelengthNm}nm`, `${countRef.current} particles detected, d=${slitSeparationUm}μm, a=${slitWidthUm}μm`)}
           >
             Record result
           </button>

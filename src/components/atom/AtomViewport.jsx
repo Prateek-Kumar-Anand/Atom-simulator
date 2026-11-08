@@ -3,7 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import StageCanvas from "../common/StageCanvas";
 import { makeSeededRandom } from "../../physics/random";
 
-const SHELL_COLORS = ["#4fd8e0", "#6bd68a", "#f2a94e", "#c084fc", "#5b8def", "#ef5b6f", "#e8eef5"];
+const SHELL_COLORS = ["#0fa3b8", "#22a35a", "#e08a0b", "#9b59e6", "#3a6fe0", "#e23d57", "#1e293b"];
 
 const NUCLEON_RADIUS = 0.32;
 
@@ -90,7 +90,7 @@ function Nucleon({ position, isProton }) {
     <mesh position={position}>
       <sphereGeometry args={[NUCLEON_RADIUS, 16, 16]} />
       <meshStandardMaterial
-        color={isProton ? "#ef5b6f" : "#5b8def"}
+        color={isProton ? "#e23d57" : "#3a6fe0"}
         emissive={isProton ? "#6b1620" : "#152a52"}
         emissiveIntensity={0.65}
         roughness={0.35}

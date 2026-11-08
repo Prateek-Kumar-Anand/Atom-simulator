@@ -1,13 +1,13 @@
 import React, { useMemo, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Stars, Line } from "@react-three/drei";
+import { OrbitControls, Line } from "@react-three/drei";
 import { fieldLines, sampleFieldGrid } from "../../physics/electromagnetism";
 
 const SCALE = 0.16; // cm -> world units
 
 function ChargeSphere({ charge, index, setDragging }) {
   const isProbe = charge.q === 0;
-  const color = isProbe ? "#6bd68a" : charge.q > 0 ? "#ef5b6f" : "#5b8def";
+  const color = isProbe ? "#22a35a" : charge.q > 0 ? "#e23d57" : "#3a6fe0";
   const radius = isProbe ? 0.22 : 0.32 + Math.min(0.28, Math.abs(charge.q) * 0.012);
   return (
     <group position={[charge.x * SCALE, charge.y * SCALE, 0.02]}>
@@ -42,7 +42,7 @@ function FieldLines({ lines }) {
   return lines.map((pts, i) => {
     if (pts.length < 2) return null;
     const points = pts.map((p) => [p.x * SCALE, p.y * SCALE, 0]);
-    return <Line key={i} points={points} color="#4fd8e0" lineWidth={1} transparent opacity={0.55} />;
+    return <Line key={i} points={points} color="#0fa3b8" lineWidth={1} transparent opacity={0.55} />;
   });
 }
 
@@ -55,7 +55,7 @@ function FieldVectors({ grid }) {
     const x0 = g.x * SCALE, y0 = g.y * SCALE;
     const x1 = x0 + ux * len, y1 = y0 + uy * len;
     const t = Math.min(1, g.mag / maxMag);
-    const color = `rgb(${Math.round(79 + t * 160)},${Math.round(216 - t * 90)},${Math.round(224 - t * 100)})`;
+    const color = `rgb(${Math.round(15 + t * 211)},${Math.round(163 - t * 102)},${Math.round(184 - t * 97)})`;
     return <Line key={i} points={[[x0, y0, 0.01], [x1, y1, 0.01]]} color={color} lineWidth={1.4} />;
   });
 }
@@ -73,9 +73,8 @@ export default function ElectricFieldViewport({ charges, onDragCharge }) {
 
   return (
     <Canvas className="qp-viewport" dpr={[1, 2]} camera={{ position: [0, 0, 11], fov: 48 }}>
-      <ambientLight color="#3a4a5c" intensity={1.2} />
-      <pointLight color="#6fe3ea" intensity={2} distance={60} position={[6, 8, 8]} />
-      <Stars radius={140} depth={60} count={1200} factor={2} fade speed={0.3} />
+      <ambientLight color="#94a3b8" intensity={1.2} />
+      <pointLight color="#ffffff" intensity={2} distance={60} position={[6, 8, 8]} />
       <DragPlane dragging={dragging} onDrag={handleDrag} setDragging={setDragging} />
       <FieldVectors grid={grid} />
       <FieldLines lines={lines} />

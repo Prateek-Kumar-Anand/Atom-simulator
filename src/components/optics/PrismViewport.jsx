@@ -24,7 +24,7 @@ function PrismSolid({ apex, baseLeft, baseRight }) {
   return (
     <mesh geometry={geometry}>
       <meshPhysicalMaterial
-        color="#bfe8ff"
+        color="#7dc4ef"
         transparent
         opacity={0.24}
         roughness={0.05}
@@ -40,7 +40,7 @@ function PrismSolid({ apex, baseLeft, baseRight }) {
 
 function PrismEdges({ apex, baseLeft, baseRight }) {
   const pts = [toWorld(apex), toWorld(baseLeft), toWorld(baseRight), toWorld(apex)];
-  return <Line points={pts} color="#8fd8ea" lineWidth={1.6} transparent opacity={0.75} />;
+  return <Line points={pts} color="#3a9ecb" lineWidth={1.6} transparent opacity={0.75} />;
 }
 
 function RaySegment({ points, color, width = 1.8, dashed = false, opacity = 0.95 }) {
@@ -64,7 +64,7 @@ function TirSpark({ point }) {
   return (
     <mesh position={toWorld(point)}>
       <sphereGeometry args={[0.09, 12, 12]} />
-      <meshStandardMaterial color="#ef5b6f" emissive="#ef5b6f" emissiveIntensity={1.2} />
+      <meshStandardMaterial color="#e23d57" emissive="#e23d57" emissiveIntensity={1.2} />
     </mesh>
   );
 }
@@ -79,12 +79,12 @@ export default function PrismViewport({ geometryBase, rays, mode }) {
       <PrismEdges apex={apex} baseLeft={baseLeft} baseRight={baseRight} />
 
       {mode === "spectrum" && rays[0] && (
-        <RaySegment points={rays[0].incident} color="#e8eef5" width={2.2} />
+        <RaySegment points={rays[0].incident} color="#1e293b" width={2.2} />
       )}
 
       {rays.map((r, i) => (
         <group key={i}>
-          {mode !== "spectrum" && <RaySegment points={r.incident} color="#e8eef5" width={2.2} />}
+          {mode !== "spectrum" && <RaySegment points={r.incident} color="#1e293b" width={2.2} />}
           <RaySegment points={r.internal} color={r.color} width={1.6} opacity={0.85} />
           {r.tir ? (
             <TirSpark point={r.internal ? r.internal[1] : r.incident[1]} />

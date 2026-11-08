@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Info } from "lucide-react";
+import { Info, AlertTriangle } from "lucide-react";
 import HUD from "../common/HUD";
 import Readout from "../common/Readout";
 import PipeViewport from "./PipeViewport";
@@ -8,7 +8,7 @@ import { FLUIDS, solvePipeFlow, samplePipeProfile } from "../../physics/fluidDyn
 import { fmt } from "../../physics/constants";
 import { useApp } from "../../context/AppContext";
 
-const REGIME_COLOR = { laminar: "#4fd8e0", transitional: "#f2a94e", turbulent: "#ef5b6f" };
+const REGIME_COLOR = { laminar: "#0fa3b8", transitional: "#e08a0b", turbulent: "#e23d57" };
 
 export default function FluidLab() {
   const { log } = useApp();
@@ -47,6 +47,13 @@ export default function FluidLab() {
         <HUD label={`PIPE FLOW · ${fluid.label.toUpperCase()} · ${solved.regime2.toUpperCase()}`}>
           <PipeViewport d1={d1} d2={d2} v1={v1} turbulence={turbulence} color={regimeColor} />
         </HUD>
+        {solved.invalidPressure && (
+          <p className="qp-instructions qp-warning">
+            <AlertTriangle size={14} /> Bernoulli predicts a throat pressure at or below zero
+            ({fmt(solved.P2 / 1000, 1)} kPa), which is physically impossible — a real liquid would
+            cavitate here. Raise the inlet pressure, widen the throat, or lower the inlet velocity.
+          </p>
+        )}
         <FlowChart data={profile} />
       </div>
 
@@ -90,9 +97,9 @@ export default function FluidLab() {
           </p>
           <div className="qp-readout-grid">
             <Readout label="Dynamic pressure q₁ (inlet)" value={`${fmt(solved.bernoulli.q1 / 1000, 3)} kPa`} />
-            <Readout label="Dynamic pressure q₂ (throat)" value={`${fmt(solved.bernoulli.q2 / 1000, 3)} kPa`} accent="#4fd8e0" />
-            <Readout label="Total pressure P₁ + q₁" value={`${fmt(solved.bernoulli.total1 / 1000, 3)} kPa`} accent="#f2a94e" />
-            <Readout label="Total pressure P₂ + q₂" value={`${fmt(solved.bernoulli.total2 / 1000, 3)} kPa`} accent="#f2a94e" />
+            <Readout label="Dynamic pressure q₂ (throat)" value={`${fmt(solved.bernoulli.q2 / 1000, 3)} kPa`} accent="#0fa3b8" />
+            <Readout label="Total pressure P₁ + q₁" value={`${fmt(solved.bernoulli.total1 / 1000, 3)} kPa`} accent="#e08a0b" />
+            <Readout label="Total pressure P₂ + q₂" value={`${fmt(solved.bernoulli.total2 / 1000, 3)} kPa`} accent="#e08a0b" />
           </div>
         </div>
 
@@ -100,8 +107,8 @@ export default function FluidLab() {
           <h4>Results</h4>
           <div className="qp-readout-grid">
             <Readout label="Inlet velocity v₁" value={`${fmt(solved.v1, 3)} m/s`} />
-            <Readout label="Throat velocity v₂" value={`${fmt(solved.v2, 3)} m/s`} accent="#4fd8e0" />
-            <Readout label="Throat pressure P₂" value={`${fmt(solved.P2 / 1000, 3)} kPa`} accent="#f2a94e" />
+            <Readout label="Throat velocity v₂" value={`${fmt(solved.v2, 3)} m/s`} accent="#0fa3b8" />
+            <Readout label="Throat pressure P₂" value={`${fmt(solved.P2 / 1000, 3)} kPa${solved.invalidPressure ? " ⚠" : ""}`} accent={solved.invalidPressure ? "#e23d57" : "#e08a0b"} />
             <Readout label="Volumetric flow Q" value={`${fmt(solved.Q * 1000, 3)} L/s`} />
             <Readout label="Reynolds number (throat)" value={fmt(solved.Re2, 0)} />
             <Readout label="Flow regime" value={solved.regime2} accent={regimeColor} />

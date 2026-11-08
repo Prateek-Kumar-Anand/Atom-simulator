@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Info } from "lucide-react";
+import { Info, AlertTriangle } from "lucide-react";
 import HUD from "../common/HUD";
 import Readout from "../common/Readout";
 import LorentzForceViewport from "./LorentzForceViewport";
@@ -9,6 +9,8 @@ import { useApp } from "../../context/AppContext";
 
 const PROTON_MASS = 1.67262192369e-27; // kg
 const ELEMENTARY_CHARGE = 1.602176634e-19; // C
+const C_LIGHT = 2.99792458e8; // m/s
+const RELATIVISTIC_FRACTION = 0.1; // above ~0.1c the non-relativistic model is no longer trustworthy
 
 export default function LorentzForceLab() {
   const { log } = useApp();
@@ -30,6 +32,7 @@ export default function LorentzForceLab() {
     [q, velocityE5, bFieldMt, eFieldVm] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
+  const fractionOfC = trajectory.maxSpeed / C_LIGHT;
   const F0 = lorentzForce(q, v0, E, B);
   const Fmag = Math.hypot(F0.x, F0.y, F0.z);
   const radius = q !== 0 && bFieldMt !== 0 ? (PROTON_MASS * Math.hypot(v0.x, v0.y, v0.z)) / (Math.abs(q) * bFieldMt * 1e-3) : Infinity;
@@ -45,6 +48,16 @@ export default function LorentzForceLab() {
         <HUD label={`LORENTZ FORCE · q=${chargeMultiple > 0 ? "+" : ""}${chargeMultiple}e`}>
           <LorentzForceViewport trajectoryPoints={trajectory.pts} particleCharge={q} bz={B.z} ey={E.y} />
         </HUD>
+        <p className="qp-muted small" style={{ margin: 0 }}>
+          The path is automatically scaled to fit the view — read the true size from the cyclotron
+          radius in the results.
+        </p>
+        {fractionOfC > RELATIVISTIC_FRACTION && (
+          <p className="qp-instructions qp-warning">
+            <AlertTriangle size={14} /> The particle reaches {fmt(fractionOfC * 100, 3)}% of the speed of
+            light. This model is non-relativistic, so treat the path as qualitative only.
+          </p>
+        )}
       </div>
 
       <div className="qp-side-col">
@@ -71,9 +84,9 @@ export default function LorentzForceLab() {
         <div className="qp-card">
           <h4>F = q(E + v × B)</h4>
           <div className="qp-readout-grid">
-            <Readout label="Force magnitude" value={`${fmt(Fmag, 4)} N`} accent="#4fd8e0" />
-            <Readout label="Cyclotron radius r = mv/qB" value={Number.isFinite(radius) ? `${fmt(radius, 3)} m` : "—"} accent="#f2a94e" />
-            <Readout label="Cyclotron period T" value={`${fmt(cyclotronPeriod * 1e6, 3)} μs`} />
+            <Readout label="Force magnitude" value={`${fmt(Fmag, 4)} N`} accent="#0fa3b8" />
+            <Readout label="Cyclotron radius r = mv/qB" value={Number.isFinite(radius) ? `${fmt(radius, 3)} m` : "—"} accent="#e08a0b" />
+            <Readout label="Cyclotron period T" value={q !== 0 ? `${fmt(cyclotronPeriod * 1e6, 3)} μs` : "—"} />
             <Readout label="Final speed" value={`${fmt(trajectory.finalSpeed / 1e5, 3)} ×10⁵ m/s`} />
           </div>
           <button

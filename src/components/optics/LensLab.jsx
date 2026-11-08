@@ -28,6 +28,12 @@ export default function LensLab() {
           through-the-center, and through-the-near-focus. Where they meet (or appear to meet) is the image.
         </p>
         <HUD label={`${lensType.toUpperCase()} LENS · f=${focalLength} cm`}>
+          {!result && (
+            <div className="qp-hud-note">
+              Object at the focal point — the emerging rays are parallel, so the image forms at infinity.
+              Move the object closer or farther to see the image again.
+            </div>
+          )}
           {result && (
             <LensViewport
               rays={rays}
@@ -73,9 +79,9 @@ export default function LensLab() {
           {result ? (
             <>
               <div className="qp-readout-grid">
-                <Readout label="Image distance v" value={`${fmt(result.imageDistance, 2)} cm`} accent="#4fd8e0" />
-                <Readout label="Magnification v/u" value={fmt(result.m, 3)} accent="#f2a94e" />
-                <Readout label="Image type" value={result.real ? "Real" : "Virtual"} accent={result.real ? "#ef5b6f" : "#c084fc"} />
+                <Readout label="Image distance v" value={`${fmt(result.imageDistance, 2)} cm`} accent="#0fa3b8" />
+                <Readout label="Magnification v/u" value={fmt(result.m, 3)} accent="#e08a0b" />
+                <Readout label="Image type" value={result.real ? "Real" : "Virtual"} accent={result.real ? "#e23d57" : "#9b59e6"} />
                 <Readout label="Orientation" value={result.orientation} />
               </div>
               <button

@@ -7,6 +7,9 @@ import DiffractionViewport from "./DiffractionViewport";
 import { sampleDiffractionPattern } from "../../physics/optics";
 import { wavelengthToColor, fmt } from "../../physics/constants";
 import { useApp } from "../../context/AppContext";
+import { CHART, TOOLTIP_STYLE, xAxisLabel } from "../common/chartTheme";
+
+const SLIT_GAP_UM = 4; // slits may not overlap: the width a must stay below the separation d
 
 export default function DiffractionLab() {
   const { log } = useApp();
@@ -42,12 +45,12 @@ export default function DiffractionLab() {
         <div className="qp-card">
           <h4>Intensity vs. screen position</h4>
           <ResponsiveContainer width="100%" height={200}>
-            <AreaChart data={pattern}>
-              <CartesianGrid stroke="#1f2b3a" />
-              <XAxis dataKey="mm" stroke="#7c8a9c" tick={{ fontSize: 10 }} label={{ value: "Screen position (mm)", position: "insideBottom", offset: -4, fill: "#7c8a9c", fontSize: 10 }} />
-              <YAxis stroke="#7c8a9c" tick={{ fontSize: 10 }} width={30} />
-              <Tooltip contentStyle={{ background: "#0d131c", border: "1px solid #1f2b3a", fontSize: 12 }} />
-              <Area type="monotone" dataKey="I" stroke={beamColor} fill={beamColor} fillOpacity={0.3} strokeWidth={2} />
+            <AreaChart data={pattern} margin={{ top: 6, right: 14, left: 0, bottom: 6 }}>
+              <CartesianGrid stroke={CHART.grid} strokeDasharray="3 3" />
+              <XAxis dataKey="mm" type="number" domain={[-25, 25]} ticks={[-25, -15, -5, 5, 15, 25]} tickFormatter={(v) => Math.round(v)} stroke={CHART.axis} tick={CHART.tick} label={xAxisLabel("Screen position (mm)")} />
+              <YAxis stroke={CHART.axis} tick={CHART.tick} width={30} tickFormatter={(v) => Number(v).toFixed(1)} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} formatter={(v) => [Number(v).toFixed(3), "Intensity"]} labelFormatter={(v) => `y = ${Number(v).toFixed(1)} mm`} />
+              <Area type="monotone" dataKey="I" stroke={beamColor} fill={beamColor} fillOpacity={0.3} strokeWidth={2} isAnimationActive={false} />
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -58,7 +61,7 @@ export default function DiffractionLab() {
           <h4>Mode</h4>
           <div className="qp-chip-row">
             <button className={"qp-chip" + (mode === "single" ? " active" : "")} onClick={() => setMode("single")}>Single slit diffraction</button>
-            <button className={"qp-chip" + (mode === "double" ? " active" : "")} onClick={() => setMode("double")}>Young&rsquo;s double slit</button>
+            <button className={"qp-chip" + (mode === "double" ? " active" : "")} onClick={() => { setMode("double"); setSlitSeparationUm((d) => Math.max(d, slitWidthUm + SLIT_GAP_UM)); }}>Young&rsquo;s double slit</button>
           </div>
         </div>
 
@@ -70,12 +73,18 @@ export default function DiffractionLab() {
           </div>
           <div className="qp-slider-row">
             <label>Slit width a = {slitWidthUm} μm</label>
-            <input type="range" min={4} max={50} step={1} value={slitWidthUm} className="qp-slider" onChange={(e) => setSlitWidthUm(Number(e.target.value))} />
+            <input
+              type="range" min={4} max={mode === "double" ? Math.min(50, slitSeparationUm - SLIT_GAP_UM) : 50} step={1}
+              value={slitWidthUm} className="qp-slider" onChange={(e) => setSlitWidthUm(Number(e.target.value))}
+            />
           </div>
           {mode === "double" && (
             <div className="qp-slider-row">
-              <label>Slit separation d = {slitSeparationUm} μm</label>
-              <input type="range" min={20} max={200} step={2} value={slitSeparationUm} className="qp-slider" onChange={(e) => setSlitSeparationUm(Number(e.target.value))} />
+              <label>Slit separation d = {slitSeparationUm} μm <span className="qp-muted">(must stay above a)</span></label>
+              <input
+                type="range" min={Math.max(20, slitWidthUm + SLIT_GAP_UM)} max={200} step={2}
+                value={slitSeparationUm} className="qp-slider" onChange={(e) => setSlitSeparationUm(Number(e.target.value))}
+              />
             </div>
           )}
           <div className="qp-slider-row">
@@ -87,7 +96,7 @@ export default function DiffractionLab() {
         <div className="qp-card">
           <h4>Results</h4>
           <div className="qp-readout-grid">
-            <Readout label={mode === "double" ? "Fringe spacing (≈λL/d)" : "Central max half-width (≈λL/a)"} value={`${fmt(fringeSpacingMm, 3)} mm`} accent="#4fd8e0" />
+            <Readout label={mode === "double" ? "Fringe spacing (≈λL/d)" : "Central max half-width (≈λL/a)"} value={`${fmt(fringeSpacingMm, 3)} mm`} accent="#0fa3b8" />
             <Readout label="Wavelength" value={`${wavelengthNm} nm`} />
           </div>
           <button

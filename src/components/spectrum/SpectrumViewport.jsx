@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import StageCanvas from "../common/StageCanvas";
 
@@ -9,7 +9,7 @@ function Nucleus() {
   return (
     <mesh>
       <sphereGeometry args={[0.4, 20, 20]} />
-      <meshStandardMaterial color="#ef5b6f" emissive="#6b1620" emissiveIntensity={0.7} />
+      <meshStandardMaterial color="#e23d57" emissive="#6b1620" emissiveIntensity={0.7} />
     </mesh>
   );
 }
@@ -20,7 +20,7 @@ function ShellRings({ ni, nf }) {
       {Array.from({ length: MAX_N }, (_, i) => i + 1).map((n) => (
         <mesh key={n} rotation={[Math.PI / 2, 0, 0]}>
           <torusGeometry args={[shellRadius(n), 0.008, 8, 96]} />
-          <meshBasicMaterial color="#4fd8e0" transparent opacity={n === ni || n === nf ? 0.55 : 0.12} />
+          <meshBasicMaterial color="#0fa3b8" transparent opacity={n === ni || n === nf ? 0.55 : 0.12} />
         </mesh>
       ))}
     </>
@@ -32,7 +32,7 @@ function Electron({ ni }) {
   return (
     <mesh position={[r, 0, 0]}>
       <sphereGeometry args={[0.19, 16, 16]} />
-      <meshStandardMaterial color="#4fd8e0" emissive="#4fd8e0" emissiveIntensity={1.2} />
+      <meshStandardMaterial color="#0fa3b8" emissive="#0fa3b8" emissiveIntensity={1.2} />
     </mesh>
   );
 }
@@ -51,7 +51,7 @@ function Photon({ ni, nf, emission, color }) {
   const ref = useRef();
   const start = emission ? shellRadius(ni) : shellRadius(nf) + 3;
   const target = emission ? null : shellRadius(nf);
-  const [opacity, setOpacity] = useState(1);
+  const matRef = useRef();
   const traveledRef = useRef(0);
   const arrivedAtRef = useRef(null);
 
@@ -62,7 +62,7 @@ function Photon({ ni, nf, emission, color }) {
       // Absorbed: hold at the destination shell and fade out quickly instead
       // of continuing to travel.
       const elapsed = performance.now() / 1000 - arrivedAtRef.current;
-      setOpacity(Math.max(0, 1 - elapsed / 0.5));
+      if (matRef.current) matRef.current.opacity = Math.max(0, 1 - elapsed / 0.5);
       return;
     }
 
@@ -78,15 +78,15 @@ function Photon({ ni, nf, emission, color }) {
     ref.current.position.x = nextX;
     traveledRef.current += Math.abs(step);
 
-    if (emission) {
-      setOpacity(Math.max(0, 1 - traveledRef.current / 9));
+    if (emission && matRef.current) {
+      matRef.current.opacity = Math.max(0, 1 - traveledRef.current / 9);
     }
   });
 
   return (
     <mesh ref={ref} position={[start, 0, 0]}>
       <sphereGeometry args={[0.14, 12, 12]} />
-      <meshBasicMaterial color={color} transparent opacity={opacity} />
+      <meshBasicMaterial ref={matRef} color={color} transparent opacity={1} />
       <pointLight color={color} intensity={1.6} distance={6} />
     </mesh>
   );

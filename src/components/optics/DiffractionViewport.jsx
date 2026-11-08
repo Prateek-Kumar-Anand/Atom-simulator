@@ -36,8 +36,8 @@ function SlitBarrier({ mode, slitSeparationUm, slitWidthUm }) {
     const barY = openingH / 2 + barLen / 2;
     return (
       <group position={[0, 0, 0]}>
-        <mesh position={[0, barY, 0]}><boxGeometry args={[0.15, barLen, 0.15]} /><meshStandardMaterial color="#7c8a9c" /></mesh>
-        <mesh position={[0, -barY, 0]}><boxGeometry args={[0.15, barLen, 0.15]} /><meshStandardMaterial color="#7c8a9c" /></mesh>
+        <mesh position={[0, barY, 0]}><boxGeometry args={[0.15, barLen, 0.15]} /><meshStandardMaterial color="#64748b" /></mesh>
+        <mesh position={[0, -barY, 0]}><boxGeometry args={[0.15, barLen, 0.15]} /><meshStandardMaterial color="#64748b" /></mesh>
       </group>
     );
   }
@@ -50,9 +50,9 @@ function SlitBarrier({ mode, slitSeparationUm, slitWidthUm }) {
   const outerY = postHeight / 2 + openingH + outerLen / 2;
   return (
     <group position={[0, 0, 0]}>
-      <mesh position={[0, outerY, 0]}><boxGeometry args={[0.15, outerLen, 0.15]} /><meshStandardMaterial color="#7c8a9c" /></mesh>
-      <mesh position={[0, 0, 0]}><boxGeometry args={[0.15, postHeight, 0.15]} /><meshStandardMaterial color="#7c8a9c" /></mesh>
-      <mesh position={[0, -outerY, 0]}><boxGeometry args={[0.15, outerLen, 0.15]} /><meshStandardMaterial color="#7c8a9c" /></mesh>
+      <mesh position={[0, outerY, 0]}><boxGeometry args={[0.15, outerLen, 0.15]} /><meshStandardMaterial color="#64748b" /></mesh>
+      <mesh position={[0, 0, 0]}><boxGeometry args={[0.15, postHeight, 0.15]} /><meshStandardMaterial color="#64748b" /></mesh>
+      <mesh position={[0, -outerY, 0]}><boxGeometry args={[0.15, outerLen, 0.15]} /><meshStandardMaterial color="#64748b" /></mesh>
     </group>
   );
 }

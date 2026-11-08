@@ -102,6 +102,9 @@ export function solvePipeFlow({ v1, d1, d2, P1, fluid }) {
     regime2: flowRegime(Re2),
     Q: v1 * pipeArea(d1), // volumetric flow rate, m^3/s (same at both ends by continuity)
     bernoulli, // { q1, q2, total1, total2 } — static + dynamic pressure at each point
+    // Absolute pressure cannot be negative: where Bernoulli predicts P2 <= 0 a real liquid
+    // would cavitate (or the flow would choke), so the ideal model no longer applies there.
+    invalidPressure: P2 <= 0,
   };
 }
 

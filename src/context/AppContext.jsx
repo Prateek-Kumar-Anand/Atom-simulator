@@ -1,5 +1,6 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { downloadText } from "../physics/constants";
+import { buildCsv, buildTextReport, fileStamp } from "../utils/exportReport";
 
 export const MODULES = [
   { key: "atom", label: "Atomic Structure", code: "01" },
@@ -26,24 +27,27 @@ export function AppProvider({ children }) {
     setVisited((v) => new Set(v).add(active));
   }, [active]);
 
+  const nextId = useRef(1);
+
   const log = useCallback((module, label, detail) => {
-    setResults((r) => [{ id: Date.now(), module, label, detail, time: new Date().toLocaleTimeString() }, ...r]);
+    // A running counter gives every entry a unique id (Date.now() collided on quick double-clicks,
+    // producing duplicate React keys). `ts` is the raw timestamp the export formats from.
+    setResults((r) => [{ id: nextId.current++, ts: Date.now(), module, label, detail }, ...r]);
     setNotebookOpen(true);
   }, []);
 
-  const exportResults = useCallback(() => {
-    const lines = [
-      "QUANTA — Atomic Physics Laboratory — Session Report",
-      `Generated: ${new Date().toLocaleString()}`,
-      `Modules explored: ${visited.size} / ${MODULES.length}`,
-      "".padEnd(60, "-"),
-      ...results.slice().reverse().map((r) => `[${r.time}] ${r.module} — ${r.label}\n  ${r.detail}`),
-    ];
-    downloadText("atomic-physics-lab-report.txt", lines.join("\n\n"));
+  // Two downloads, one fixed schema (see utils/exportReport.js).
+  const exportCsv = useCallback(() => {
+    downloadText(`quanta-lab-results_${fileStamp(Date.now())}.csv`, buildCsv(results), "text/csv");
+  }, [results]);
+
+  const exportReport = useCallback(() => {
+    const now = Date.now();
+    downloadText(`quanta-lab-report_${fileStamp(now)}.txt`, buildTextReport(results, MODULES, visited, now));
   }, [results, visited]);
 
   const value = {
-    active, setActive, visited, results, log, exportResults,
+    active, setActive, visited, results, log, exportCsv, exportReport,
     notebookOpen, setNotebookOpen,
   };
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

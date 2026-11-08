@@ -112,11 +112,13 @@ export function barMagnetFieldAt(strength, px, py) {
 export function wireFieldAt(currentA, px, py) {
   const rCm = Math.max(Math.hypot(px, py), 0.2);
   const r = rCm / 100;
-  const Bmag = (MU0 * currentA) / (2 * Math.PI * r); // Tesla
+  const Bsigned = (MU0 * currentA) / (2 * Math.PI * r); // Tesla; sign encodes the current direction
   const theta = Math.atan2(py, px);
   // Azimuthal direction (counter-clockwise for current out of page, +I convention)
-  const Bx = -Bmag * Math.sin(theta);
-  const By = Bmag * Math.cos(theta);
+  const Bx = -Bsigned * Math.sin(theta);
+  const By = Bsigned * Math.cos(theta);
+  // Magnitude is always >= 0 (reversing the current flips the direction, not the size).
+  const Bmag = Math.abs(Bsigned);
   return { Bx, By, mag: Bmag, mT: Bmag * 1000 };
 }
 
@@ -179,6 +181,7 @@ export function integrateTrajectory({ q, m, v0, E, B, dt = 1e-11, steps = 400 })
   let pos = { x: 0, y: 0, z: 0 };
   let vel = { ...v0 };
   const pts = [{ ...pos, t: 0 }];
+  let maxSpeed = Math.hypot(vel.x, vel.y, vel.z);
 
   const accel = (v) => {
     const F = lorentzForce(q, v, E, B);
@@ -212,11 +215,12 @@ export function integrateTrajectory({ q, m, v0, E, B, dt = 1e-11, steps = 400 })
       z: vel.z + (dt / 6) * (k1v.z + 2 * k2v.z + 2 * k3v.z + k4v.z),
     };
     pts.push({ ...pos, t: (i + 1) * dt });
-
-    // Bail out early if the particle has flown far off the visualized region.
-    if (Math.hypot(pos.x, pos.y, pos.z) > 5) break;
+    maxSpeed = Math.max(maxSpeed, Math.hypot(vel.x, vel.y, vel.z));
+    // Stop only if the integration has numerically blown up; the viewport rescales the
+    // path to fit, so there is no need to cut it off at a fixed physical distance.
+    if (!Number.isFinite(pos.x + pos.y + pos.z)) { pts.pop(); break; }
   }
-  return { pts, finalSpeed: Math.hypot(vel.x, vel.y, vel.z) };
+  return { pts, finalSpeed: Math.hypot(vel.x, vel.y, vel.z), maxSpeed };
 }
 
 // --- Electromagnetic waves ---------------------------------------------------

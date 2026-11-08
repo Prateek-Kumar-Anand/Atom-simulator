@@ -7,7 +7,7 @@ export default function PhotoelectricStage({ photonE, intensity, freqTHz, emitti
   return (
     <div className="qp-card qp-photo-stage">
       <div className="qp-photo-source">
-        <Lightbulb size={28} color="#f2a94e" />
+        <Lightbulb size={28} color="#e08a0b" />
         <div className="qp-photo-beam" style={{ opacity: 0.35 + (intensity / 100) * 0.65 }}>
           {Array.from({ length: 5 }).map((_, i) => (
             <span

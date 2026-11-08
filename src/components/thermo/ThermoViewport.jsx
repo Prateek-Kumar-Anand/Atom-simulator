@@ -15,10 +15,10 @@ function Cylinder({ height }) {
     <group position={[0, BASE_Y + height / 2, 0]}>
       <mesh>
         <boxGeometry args={[HALF_SIDE * 2, height, HALF_SIDE * 2]} />
-        <meshStandardMaterial color="#0d1622" transparent opacity={0.12} roughness={0.4} metalness={0.1} />
+        <meshStandardMaterial color="#7a8fb5" transparent opacity={0.12} roughness={0.4} metalness={0.1} />
       </mesh>
       <lineSegments geometry={geo}>
-        <lineBasicMaterial color="#2a3a4d" />
+        <lineBasicMaterial color="#94a3b8" />
       </lineSegments>
     </group>
   );
@@ -28,7 +28,7 @@ function Piston({ height }) {
   return (
     <mesh position={[0, BASE_Y + height + 0.08, 0]}>
       <boxGeometry args={[HALF_SIDE * 2.12, 0.16, HALF_SIDE * 2.12]} />
-      <meshStandardMaterial color="#7c8a9c" emissive="#2a3a4d" emissiveIntensity={0.4} roughness={0.35} metalness={0.6} />
+      <meshStandardMaterial color="#64748b" emissive="#94a3b8" emissiveIntensity={0.4} roughness={0.35} metalness={0.6} />
     </mesh>
   );
 }
@@ -84,7 +84,7 @@ function GasMolecules({ heightRef, speedFactorRef, color }) {
   );
 }
 
-export default function ThermoViewport({ height, temperatureFactor, color = "#4fd8e0" }) {
+export default function ThermoViewport({ height, temperatureFactor, color = "#0fa3b8" }) {
   const heightRef = useRef(height);
   const speedFactorRef = useRef(Math.sqrt(Math.max(temperatureFactor, 0.05)));
   useEffect(() => { heightRef.current = height; }, [height]);

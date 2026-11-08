@@ -36,8 +36,8 @@ export default class ErrorBoundary extends React.Component {
   render() {
     if (this.state.error) {
       return (
-        <div className="qp-card" style={{ margin: 16, borderColor: "#ef5b6f" }}>
-          <h3 style={{ display: "flex", alignItems: "center", gap: 8, color: "#ef5b6f" }}>
+        <div className="qp-card" style={{ margin: 16, borderColor: "#e23d57" }}>
+          <h3 style={{ display: "flex", alignItems: "center", gap: 8, color: "#e23d57" }}>
             <AlertTriangle size={18} /> This module hit an error
           </h3>
           <p className="qp-element-summary">

@@ -30,8 +30,8 @@ export default function PhotoelectricLab() {
           KEmax={result.KEmax}
           metalName={metal.name}
         />
-        <KineticEnergyChart workFunctionEV={metal.phi} thresholdFreq={result.thresholdFrequency / 1e14} />
-        <PhotocurrentChart stoppingV={result.stoppingVoltage} intensity={intensity} />
+        <KineticEnergyChart workFunctionEV={metal.phi} thresholdFreq={result.thresholdFrequency / 1e14} currentFreq={freqTHz} />
+        <PhotocurrentChart stoppingV={result.stoppingVoltage} intensity={intensity} emitting={result.emitting} />
       </div>
 
       <div className="qp-side-col">
@@ -57,9 +57,9 @@ export default function PhotoelectricLab() {
           <h4>Results</h4>
           <div className="qp-readout-grid">
             <Readout label="Work function φ" value={`${metal.phi} eV`} />
-            <Readout label="Photon energy E=hf" value={`${fmt(result.photonE)} eV`} accent="#f2a94e" />
+            <Readout label="Photon energy E=hf" value={`${fmt(result.photonE)} eV`} accent="#e08a0b" />
             <Readout label="Threshold frequency f₀" value={`${fmt(result.thresholdFrequency / 1e14)}×10¹⁴ Hz`} />
-            <Readout label="Max kinetic energy" value={`${fmt(result.KEmax)} eV`} accent="#4fd8e0" />
+            <Readout label="Max kinetic energy" value={`${fmt(result.KEmax)} eV`} accent="#0fa3b8" />
             <Readout label="Stopping potential Vs" value={`${fmt(result.stoppingVoltage)} V`} />
             <Readout label="Emission occurring?" value={result.emitting ? "Yes" : "No — below threshold"} />
           </div>

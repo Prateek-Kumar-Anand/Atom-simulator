@@ -52,7 +52,7 @@ export default function DecayLab() {
           </select>
           <div className="qp-slider-row">
             <label>Simulated half-life = {halfLife}s</label>
-            <input type="range" min={3} max={40} value={halfLife} onChange={(e) => setHalfLife(Number(e.target.value))} className="qp-slider" />
+            <input type="range" min={3} max={40} value={halfLife} onChange={(e) => { setHalfLife(Number(e.target.value)); setResetToken((x) => x + 1); }} className="qp-slider" />
           </div>
           <div className="qp-slider-row">
             <label>Atom count = {atomCount}</label>
@@ -72,7 +72,7 @@ export default function DecayLab() {
         <div className="qp-card">
           <h4>Results</h4>
           <div className="qp-readout-grid">
-            <Readout label="Remaining atoms" value={`${sim.currentN} / ${atomCount}`} accent="#4fd8e0" />
+            <Readout label="Remaining atoms" value={`${sim.currentN} / ${atomCount}`} accent="#0fa3b8" />
             <Readout label="Decay constant λ" value={`${fmt(sim.lambda)} /s`} />
             <Readout label="Mean lifetime τ = 1/λ" value={`${fmt(1 / sim.lambda)} s`} />
             <Readout label="Half-lives elapsed" value={fmt(halfLivesElapsed, 2)} />

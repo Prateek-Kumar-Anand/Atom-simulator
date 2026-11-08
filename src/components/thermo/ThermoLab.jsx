@@ -10,7 +10,7 @@ import { fmt } from "../../physics/constants";
 import { useApp } from "../../context/AppContext";
 
 const BASE_HEIGHT = 3;
-const PROCESS_COLOR = { isothermal: "#4fd8e0", isobaric: "#f2a94e", isochoric: "#c084fc", adiabatic: "#ef5b6f" };
+const PROCESS_COLOR = { isothermal: "#0fa3b8", isobaric: "#e08a0b", isochoric: "#9b59e6", adiabatic: "#e23d57" };
 
 export default function ThermoLab() {
   const { log } = useApp();
@@ -124,12 +124,12 @@ export default function ThermoLab() {
             <input type="range" min={0.5} max={3} step={0.1} value={n} className="qp-slider" onChange={(e) => setN(Number(e.target.value))} />
           </div>
           <div className="qp-slider-row">
-            <label>Temperature T₁ = {T1} K</label>
-            <input type="range" min={150} max={600} step={10} value={T1} className="qp-slider" onChange={(e) => setT1(Number(e.target.value))} />
+            <label>Temperature T₁ = {Number(T1.toFixed(2))} K</label>
+            <input type="range" min={50} max={600} step={1} value={Math.round(T1)} className="qp-slider" onChange={(e) => setT1(Number(e.target.value))} />
           </div>
           <div className="qp-slider-row">
             <label>Volume V₁ = {V1L.toFixed(1)} L</label>
-            <input type="range" min={1} max={10} step={0.1} value={V1L} className="qp-slider" onChange={(e) => setV1L(Number(e.target.value))} />
+            <input type="range" min={1} max={40} step={0.1} value={Math.min(40, V1L)} className="qp-slider" onChange={(e) => setV1L(Number(e.target.value))} />
           </div>
           <div className="qp-slider-row">
             <label>{isochoric ? `Final temperature ratio T₂/T₁ = ${control.toFixed(2)}` : `Final volume ratio V₂/V₁ = ${control.toFixed(2)}`}</label>
@@ -152,9 +152,9 @@ export default function ThermoLab() {
           <div className="qp-readout-grid">
             <Readout label="P₁, V₁, T₁" value={`${fmt(process.state1.P / 1000, 2)} kPa, ${fmt(process.state1.V * 1000, 2)} L, ${fmt(process.state1.T, 3)} K`} />
             <Readout label="P₂, V₂, T₂" value={`${fmt(process.state2.P / 1000, 2)} kPa, ${fmt(process.state2.V * 1000, 2)} L, ${fmt(process.state2.T, 3)} K`} />
-            <Readout label="Work done by gas (W)" value={`${fmt(process.W, 3)} J`} accent="#f2a94e" />
+            <Readout label="Work done by gas (W)" value={`${fmt(process.W, 3)} J`} accent="#e08a0b" />
             <Readout label="Change in internal energy (ΔU)" value={`${fmt(process.dU, 3)} J`} />
-            <Readout label="Heat transferred (Q)" value={`${fmt(process.Q, 3)} J`} accent="#4fd8e0" />
+            <Readout label="Heat transferred (Q)" value={`${fmt(process.Q, 3)} J`} accent="#0fa3b8" />
             <Readout label="Heat capacity ratio γ" value={fmt(process.gamma, 3)} />
           </div>
           <button

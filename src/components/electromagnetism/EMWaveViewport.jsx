@@ -69,7 +69,7 @@ function PropagationAxis() {
   }, []);
   return (
     <line geometry={geom}>
-      <lineBasicMaterial color="#7c8a9c" transparent opacity={0.5} />
+      <lineBasicMaterial color="#64748b" transparent opacity={0.5} />
     </line>
   );
 }
@@ -88,7 +88,7 @@ function PropagationPulse({ speed }) {
   return (
     <mesh ref={ref} rotation={[0, 0, -Math.PI / 2]}>
       <coneGeometry args={[0.13, 0.34, 12]} />
-      <meshStandardMaterial color="#e8eef5" emissive="#e8eef5" emissiveIntensity={0.9} />
+      <meshStandardMaterial color="#1e293b" emissive="#1e293b" emissiveIntensity={0.9} />
     </mesh>
   );
 }
@@ -100,11 +100,11 @@ export default function EMWaveViewport({ amplitude, wavelengthFrac, speedFactor 
     <StageCanvas cameraDistance={12} minDistance={6} maxDistance={24} autoRotateSpeed={0.4}>
       <PropagationAxis />
       <PropagationPulse speed={speedFactor} />
-      <WaveCurve axis="y" color="#4fd8e0" amplitude={amplitude} cyclesVisible={cyclesVisible} speed={speedFactor} />
-      <WaveCurve axis="z" color="#f2a94e" amplitude={amplitude} cyclesVisible={cyclesVisible} speed={speedFactor} />
-      <Label3D text="E" position={[labelX, amplitude, 0]} color="#4fd8e0" scale={0.55} />
-      <Label3D text="B" position={[labelX, 0, amplitude]} color="#f2a94e" scale={0.55} />
-      <Label3D text="c" position={[0, 0.55, 0.55]} color="#e8eef5" scale={0.45} />
+      <WaveCurve axis="y" color="#0fa3b8" amplitude={amplitude} cyclesVisible={cyclesVisible} speed={speedFactor} />
+      <WaveCurve axis="z" color="#e08a0b" amplitude={amplitude} cyclesVisible={cyclesVisible} speed={speedFactor} />
+      <Label3D text="E" position={[labelX, amplitude, 0]} color="#0fa3b8" scale={0.55} />
+      <Label3D text="B" position={[labelX, 0, amplitude]} color="#e08a0b" scale={0.55} />
+      <Label3D text="c" position={[0, 0.55, 0.55]} color="#1e293b" scale={0.45} />
     </StageCanvas>
   );
 }

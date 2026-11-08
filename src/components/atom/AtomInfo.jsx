@@ -19,9 +19,9 @@ export default function AtomInfo({ element, shells, onRecord }) {
       <div className="qp-readout-grid">
         <Readout label="Atomic number (Z)" value={element.Z} />
         <Readout label="Mass number (A)" value={element.A} />
-        <Readout label="Protons" value={element.Z} accent="#ef5b6f" />
-        <Readout label="Neutrons" value={element.neutrons} accent="#5b8def" />
-        <Readout label="Electrons" value={element.Z} accent="#4fd8e0" />
+        <Readout label="Protons" value={element.Z} accent="#e23d57" />
+        <Readout label="Neutrons" value={element.neutrons} accent="#3a6fe0" />
+        <Readout label="Electrons" value={element.Z} accent="#0fa3b8" />
         <Readout label="Block" value={`${element.block}-block`} />
         <Readout label="Period" value={pos.period} />
         <Readout label="Group" value={groupLabel} />

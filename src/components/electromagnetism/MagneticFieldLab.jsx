@@ -101,17 +101,17 @@ export default function MagneticFieldLab() {
             {source === "wire" && (
               <>
                 <Readout label="Probe distance r" value={`${fmt(probeR, 2)} cm`} />
-                <Readout label="B = μ₀I/2πr at probe" value={`${fmt(probeField.mT, 4)} mT`} accent="#4fd8e0" />
+                <Readout label="B = μ₀I/2πr at probe" value={`${fmt(probeField.mT, 4)} mT`} accent="#0fa3b8" />
                 <Readout label="Field direction (compass)" value={`${fmt(probeAngleDeg, 1)}°`} />
                 <Readout label="μ₀" value={`${fmt(MU0, 4)} T·m/A`} />
               </>
             )}
             {source === "solenoid" && (
-              <Readout label="B = μ₀nI (inside)" value={`${fmt(solenoidB * 1000, 4)} mT`} accent="#4fd8e0" />
+              <Readout label="B = μ₀nI (inside)" value={`${fmt(solenoidB * 1000, 4)} mT`} accent="#0fa3b8" />
             )}
             {source === "bar" && (
               <>
-                <Readout label="Field model" value="Magnetic dipole" accent="#4fd8e0" />
+                <Readout label="Field model" value="Magnetic dipole" accent="#0fa3b8" />
                 <Readout label="Compass distance from magnet" value={`${fmt(probeR, 2)}`} />
                 <Readout label="Field direction (compass)" value={`${fmt(probeAngleDeg, 1)}°`} />
               </>

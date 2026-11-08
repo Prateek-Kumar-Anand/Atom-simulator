@@ -138,9 +138,9 @@ export default function ParticleLab() {
           <h4>Results</h4>
           <div className="qp-readout-grid">
             <Readout label="Balls" value={balls.length} />
-            <Readout label="Collisions" value={stats.collisions} accent="#f2a94e" />
+            <Readout label="Collisions" value={stats.collisions} accent="#e08a0b" />
             <Readout label="Total momentum |p|" value={fmt(stats.momentum, 2)} />
-            <Readout label="Total kinetic energy" value={fmt(stats.ke, 2)} accent="#4fd8e0" />
+            <Readout label="Total kinetic energy" value={fmt(stats.ke, 2)} accent="#0fa3b8" />
           </div>
           <div className="qp-shellrow" style={{ flexWrap: "wrap", gap: 8 }}>
             {stats.speeds.map((v, i) => (

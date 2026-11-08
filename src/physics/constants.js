@@ -21,22 +21,28 @@ export const CONST = {
 
 /** Format a number for display, switching to scientific notation for very large/small values. */
 export function fmt(n, digits = 3) {
-  if (n === null || n === undefined || Number.isNaN(n)) return "—";
+  if (n === null || n === undefined || typeof n !== "number" || !Number.isFinite(n)) return "—";
   if (Math.abs(n) !== 0 && (Math.abs(n) < 1e-3 || Math.abs(n) >= 1e5)) return n.toExponential(digits);
   return n.toLocaleString(undefined, { maximumFractionDigits: digits });
 }
 
-/** Trigger a client-side text file download (used by the results-export feature). */
+/**
+ * Trigger a client-side file download (used by the results-export feature).
+ * The charset is declared explicitly so symbols such as λ, μ, Δ, → and ² survive
+ * the round-trip through Excel / Notepad / Numbers instead of turning into mojibake.
+ */
 export function downloadText(filename, content, mime = "text/plain") {
-  const blob = new Blob([content], { type: mime });
+  const blob = new Blob([content], { type: `${mime};charset=utf-8` });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
   a.download = filename;
+  a.rel = "noopener";
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  // Revoke on the next tick: revoking synchronously can cancel the download in Safari/Firefox.
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 /**
@@ -53,7 +59,7 @@ export function wavelengthToColor(wl) {
   else if (wl < 580) { r = (wl - 510) / 70; g = 1; b = 0; }
   else if (wl < 645) { r = 1; g = -(wl - 645) / 65; b = 0; }
   else if (wl <= 780) { r = 1; g = 0; b = 0; }
-  else return "rgb(70,70,95)";
+  else return "rgb(125,135,155)";
 
   let factor = 1;
   if (wl < 420) factor = 0.3 + (0.7 * (wl - 380)) / 40;

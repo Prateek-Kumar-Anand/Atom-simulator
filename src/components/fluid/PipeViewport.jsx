@@ -30,10 +30,10 @@ function PipeShell({ d1, d2 }) {
   return (
     <group rotation={[0, 0, Math.PI / 2]}>
       <mesh geometry={geometries.lathe}>
-        <meshStandardMaterial color="#0d1622" transparent opacity={0.14} roughness={0.4} metalness={0.15} side={THREE.DoubleSide} />
+        <meshStandardMaterial color="#7a8fb5" transparent opacity={0.14} roughness={0.4} metalness={0.15} side={THREE.DoubleSide} />
       </mesh>
       <lineSegments geometry={geometries.edges}>
-        <lineBasicMaterial color="#2a3a4d" />
+        <lineBasicMaterial color="#94a3b8" />
       </lineSegments>
     </group>
   );

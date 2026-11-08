@@ -112,14 +112,15 @@ export function computeMirrorRays(objectDistanceCm, fMagCm, objectHeightCm, isCo
 /** Snell's law: n1·sinθ1 = n2·sinθ2. Angles in degrees. Returns null on total internal reflection. */
 export function snellRefract(n1, n2, theta1Deg) {
   const theta1 = (theta1Deg * Math.PI) / 180;
+  // The critical angle exists whenever light travels from a denser to a rarer medium (n1 > n2),
+  // whether or not the current angle of incidence has passed it — so report it in both branches.
+  const critical = n1 > n2 ? (Math.asin(n2 / n1) * 180) / Math.PI : null;
   const sinTheta2 = (n1 / n2) * Math.sin(theta1);
   if (Math.abs(sinTheta2) > 1) {
-    // Total internal reflection: critical angle is still meaningful to report.
-    const critical = n1 > n2 ? (Math.asin(n2 / n1) * 180) / Math.PI : null;
     return { totalInternalReflection: true, criticalAngleDeg: critical };
   }
   const theta2 = Math.asin(sinTheta2);
-  return { totalInternalReflection: false, theta2Deg: (theta2 * 180) / Math.PI };
+  return { totalInternalReflection: false, theta2Deg: (theta2 * 180) / Math.PI, criticalAngleDeg: critical };
 }
 
 /** Common refractive indices for the medium picker. */

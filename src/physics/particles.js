@@ -43,13 +43,16 @@ import * as THREE from "three";
 
 export function resolveWallCollision(p, boundsHalf) {
   ["x", "y", "z"].forEach((axis) => {
+    // Only flip the velocity component if the particle is actually moving INTO the wall.
+    // A particle that a collision has already pushed past the wall while heading back inward
+    // must not be reversed again, or it gets thrown back out and jitters against the wall.
     if (p.pos[axis] > boundsHalf - p.radius) {
       p.pos[axis] = boundsHalf - p.radius;
-      p.vel[axis] *= -1;
+      if (p.vel[axis] > 0) p.vel[axis] *= -1;
     }
     if (p.pos[axis] < -boundsHalf + p.radius) {
       p.pos[axis] = -boundsHalf + p.radius;
-      p.vel[axis] *= -1;
+      if (p.vel[axis] < 0) p.vel[axis] *= -1;
     }
   });
 }

@@ -12,12 +12,12 @@
  * -----------------------------------------------------------------------
  */
 export const CATEGORY_COLOR = {
-  "nonmetal": "#4fd8e0",
-  "noble gas": "#c084fc",
-  "alkali metal": "#ef5b6f",
-  "alkaline earth metal": "#f2a94e",
-  "metalloid": "#6bd68a",
-  "halogen": "#5b8def",
+  "nonmetal": "#0fa3b8",
+  "noble gas": "#9b59e6",
+  "alkali metal": "#e23d57",
+  "alkaline earth metal": "#e08a0b",
+  "metalloid": "#22a35a",
+  "halogen": "#3a6fe0",
 };
 
 const RAW = [

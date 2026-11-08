@@ -41,6 +41,12 @@ export default function MirrorLab() {
           front of the surface; convex mirrors diverge them from a virtual focus behind it.
         </p>
         <HUD label={`${kind.toUpperCase()} MIRROR`}>
+          {!result && (
+            <div className="qp-hud-note">
+              Object at the focal point — the reflected rays are parallel, so the image forms at infinity.
+              Move the object closer or farther to see the image again.
+            </div>
+          )}
           {result && (
             <MirrorViewport
               rays={rays}
@@ -89,9 +95,9 @@ export default function MirrorLab() {
           {result ? (
             <>
               <div className="qp-readout-grid">
-                <Readout label="Image distance v" value={`${fmt(result.imageDistance, 2)} cm`} accent="#4fd8e0" />
-                <Readout label="Magnification m = −v/u" value={fmt(result.m, 3)} accent="#f2a94e" />
-                <Readout label="Image type" value={result.real ? "Real" : "Virtual"} accent={result.real ? "#ef5b6f" : "#c084fc"} />
+                <Readout label="Image distance v" value={`${fmt(result.imageDistance, 2)} cm`} accent="#0fa3b8" />
+                <Readout label="Magnification m = −v/u" value={fmt(result.m, 3)} accent="#e08a0b" />
+                <Readout label="Image type" value={result.real ? "Real" : "Virtual"} accent={result.real ? "#e23d57" : "#9b59e6"} />
                 <Readout label="Orientation" value={result.orientation} />
               </div>
               <button

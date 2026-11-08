@@ -7,6 +7,7 @@ import EMWaveViewport from "./EMWaveViewport";
 import { sampleEMWave, SPEED_OF_LIGHT_DERIVED, MU0, EPS0 } from "../../physics/electromagnetism";
 import { fmt } from "../../physics/constants";
 import { useApp } from "../../context/AppContext";
+import { CHART, TOOLTIP_STYLE, xAxisLabel } from "../common/chartTheme";
 
 export default function EMWaveLab() {
   const { log } = useApp();
@@ -16,7 +17,7 @@ export default function EMWaveLab() {
 
   const frequency = SPEED_OF_LIGHT_DERIVED / (wavelengthNm * 1e-9);
   const chartData = useMemo(
-    () => sampleEMWave({ amplitude, wavelengthM: 1, t: 0, length: 4, steps: 120 }).map((p) => ({ z: p.z.toFixed(2), E: p.E, B: p.B })),
+    () => sampleEMWave({ amplitude, wavelengthM: 1, t: 0, length: 4, steps: 120 }).map((p) => ({ z: Number(p.z.toFixed(3)), E: p.E, B: p.B })),
     [amplitude]
   );
   const wavelengthFrac = 0.28; // fixed visual cycle density independent of the physical nm value, for a readable viewport
@@ -36,13 +37,13 @@ export default function EMWaveLab() {
           <h4>Field profile snapshot (E ⊥ B ⊥ propagation)</h4>
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={chartData} margin={{ top: 6, right: 12, left: 0, bottom: 6 }}>
-              <CartesianGrid stroke="#1f2b3a" />
-              <XAxis dataKey="z" stroke="#7c8a9c" tick={{ fontSize: 10 }} label={{ value: "Position along propagation axis", position: "insideBottom", offset: -4, fill: "#7c8a9c", fontSize: 10 }} />
-              <YAxis stroke="#7c8a9c" tick={{ fontSize: 10 }} width={30} />
-              <Tooltip contentStyle={{ background: "#0d131c", border: "1px solid #1f2b3a", fontSize: 12 }} />
+              <CartesianGrid stroke={CHART.grid} strokeDasharray="3 3" />
+              <XAxis dataKey="z" type="number" domain={[-2, 2]} ticks={[-2, -1, 0, 1, 2]} stroke={CHART.axis} tick={CHART.tick} label={xAxisLabel("Position along propagation axis (in wavelengths λ)")} />
+              <YAxis stroke={CHART.axis} tick={CHART.tick} width={30} />
+              <Tooltip contentStyle={TOOLTIP_STYLE} />
               <Legend wrapperStyle={{ fontSize: 11 }} />
-              <Line type="monotone" dataKey="E" name="Electric field E" stroke="#4fd8e0" dot={false} strokeWidth={2} />
-              <Line type="monotone" dataKey="B" name="Magnetic field B" stroke="#f2a94e" dot={false} strokeWidth={2} />
+              <Line type="monotone" dataKey="E" name="Electric field E" stroke="#0fa3b8" dot={false} strokeWidth={2} />
+              <Line type="monotone" dataKey="B" name="Magnetic field B" stroke="#e08a0b" dot={false} strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -68,10 +69,10 @@ export default function EMWaveLab() {
         <div className="qp-card">
           <h4>c = 1/√(μ₀ε₀)</h4>
           <div className="qp-readout-grid">
-            <Readout label="Speed of light c" value={`${fmt(SPEED_OF_LIGHT_DERIVED, 6)} m/s`} accent="#4fd8e0" />
+            <Readout label="Speed of light c" value={`${fmt(SPEED_OF_LIGHT_DERIVED, 6)} m/s`} accent="#0fa3b8" />
             <Readout label="μ₀" value={`${fmt(MU0, 4)} T·m/A`} />
             <Readout label="ε₀" value={`${fmt(EPS0, 4)} F/m`} />
-            <Readout label="Frequency f = c/λ" value={`${fmt(frequency / 1e12, 3)} THz`} accent="#f2a94e" />
+            <Readout label="Frequency f = c/λ" value={`${fmt(frequency / 1e12, 3)} THz`} accent="#e08a0b" />
           </div>
           <button
             className="qp-btn"

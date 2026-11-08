@@ -10,11 +10,11 @@ function ParticleCard({ label, value }) {
       <h4>{label}</h4>
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: 80 }}>
         {value === null ? (
-          <HelpCircle size={40} color="#7c8a9c" />
+          <HelpCircle size={40} color="#64748b" />
         ) : value === "↑" ? (
-          <ArrowUp size={40} color="#4fd8e0" />
+          <ArrowUp size={40} color="#0fa3b8" />
         ) : (
-          <ArrowDown size={40} color="#ef5b6f" />
+          <ArrowDown size={40} color="#e23d57" />
         )}
       </div>
       <div className="small qp-muted">{value === null ? "Not yet measured" : `Spin ${value === "↑" ? "up" : "down"}`}</div>
@@ -27,7 +27,8 @@ export default function EntanglementLab() {
   const [pair, setPair] = useState(null); // the hidden, already-determined pair once generated
   const [revealedA, setRevealedA] = useState(null);
   const [revealedB, setRevealedB] = useState(null);
-  const [history, setHistory] = useState([]);
+  const [history, setHistory] = useState([]); // most recent 12 pairs, for the on-screen list
+  const [tally, setTally] = useState({ total: 0, opposite: 0 }); // running totals over the whole session
 
   const generatePair = () => {
     setPair(measureEntangledPair());
@@ -46,12 +47,16 @@ export default function EntanglementLab() {
     if (revealedA !== null) recordIfComplete(revealedA, pair.b);
   };
 
+  // Called once, when the second particle of a pair is measured. The running counter (not the
+  // length of the capped list) numbers the pairs — the old code derived the id from the list
+  // length, so after 12 pairs every new entry got id 13, producing duplicate React keys and a
+  // tally frozen at 12.
   const recordIfComplete = (a, b) => {
-    setHistory((h) => [{ i: h.length + 1, a, b }, ...h].slice(0, 12));
+    const id = tally.total + 1;
+    setTally((t) => ({ total: t.total + 1, opposite: t.opposite + (a !== b ? 1 : 0) }));
+    setHistory((h) => [{ i: id, a, b }, ...h].slice(0, 12));
   };
 
-  // When both sides have just been revealed in the same click sequence, the effect above may
-  // race — so also catch the "both now known" case directly here for a reliable log entry.
   const bothKnown = pair && revealedA !== null && revealedB !== null;
 
   return (
@@ -93,10 +98,10 @@ export default function EntanglementLab() {
         <div className="qp-card">
           <h4>Results</h4>
           <div className="qp-readout-grid">
-            <Readout label="Measurements" value={history.length} />
-            <Readout label="Anti-correlated" value={history.length > 0 ? `${history.filter((h) => h.a !== h.b).length}/${history.length}` : "—"} accent="#4fd8e0" />
+            <Readout label="Pairs measured" value={tally.total} />
+            <Readout label="Anti-correlated" value={tally.total > 0 ? `${tally.opposite}/${tally.total}` : "—"} accent="#0fa3b8" />
           </div>
-          <div style={{ maxHeight: 160, overflowY: "auto" }}>
+          <div style={{ maxHeight: 160, overflowY: "auto" }} aria-label="Most recent 12 pairs">
             {history.map((h) => (
               <div key={h.i} className="qp-shellrow small qp-muted" style={{ padding: "4px 0" }}>
                 <span>#{h.i}</span><span>A: {h.a}</span><span>B: {h.b}</span>
@@ -106,7 +111,7 @@ export default function EntanglementLab() {
           <button
             className="qp-btn"
             disabled={!bothKnown}
-            onClick={() => log("Quantum: Entanglement", `Pair #${history.length}`, `A=${revealedA}, B=${revealedB} (always opposite)`)}
+            onClick={() => log("Quantum: Entanglement", `Pair #${tally.total}`, `A=${revealedA}, B=${revealedB} (always opposite)`)}
           >
             Record result
           </button>

@@ -41,8 +41,10 @@ function AppShell() {
           <ActiveLab />
         </ErrorBoundary>
       </main>
-      <TheoryDrawer />
-      <Notebook />
+      <div className="qp-dock">
+        <TheoryDrawer />
+        <Notebook />
+      </div>
     </div>
   );
 }

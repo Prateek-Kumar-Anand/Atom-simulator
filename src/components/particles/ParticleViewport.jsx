@@ -6,13 +6,13 @@ import { stepParticles, totalMomentum, totalKineticEnergy } from "../../physics/
 import { makeSeededRandom } from "../../physics/random";
 
 const BOUNDS_HALF = 5;
-export const BALL_COLORS = ["#c084fc", "#f2a94e", "#4fd8e0", "#6bd68a", "#ef5b6f", "#5b8def", "#e0c34f", "#8de0c0"];
+export const BALL_COLORS = ["#9b59e6", "#e08a0b", "#0fa3b8", "#22a35a", "#e23d57", "#3a6fe0", "#c9a227", "#2bb894"];
 
 function BoundingBox() {
   const geo = useMemo(() => new THREE.EdgesGeometry(new THREE.BoxGeometry(BOUNDS_HALF * 2, BOUNDS_HALF * 2, BOUNDS_HALF * 2)), []);
   return (
     <lineSegments geometry={geo}>
-      <lineBasicMaterial color="#2a3a4d" />
+      <lineBasicMaterial color="#94a3b8" />
     </lineSegments>
   );
 }

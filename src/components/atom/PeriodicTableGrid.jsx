@@ -10,8 +10,8 @@ function Cell({ el, selected, dim, onSelect }) {
   const style = {
     gridColumn: el.pos.footnote ? el.pos.footnoteCol : el.pos.group,
     gridRow: el.pos.footnote ? undefined : el.pos.period,
-    borderColor: selected ? color : "rgba(255,255,255,0.08)",
-    background: selected ? `${color}33` : "rgba(255,255,255,0.02)",
+    borderColor: selected ? color : "rgba(100,116,139,0.28)",
+    background: selected ? `${color}38` : "rgba(255,255,255,0.55)",
     opacity: dim ? 0.28 : 1,
   };
   return (

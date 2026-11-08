@@ -35,16 +35,16 @@ export const CATEGORY_LABEL = {
 };
 
 export const CATEGORY_COLOR = {
-  alkali: "#ef5b6f",
-  alkaline: "#f2a94e",
-  transition: "#5b8def",
-  lanthanide: "#c084fc",
-  actinide: "#a374e8",
-  posttransition: "#6bd68a",
-  metalloid: "#d9c25c",
-  nonmetal: "#4fd8e0",
-  halogen: "#35b6c9",
-  noble: "#8fa8c8",
+  alkali: "#e23d57",
+  alkaline: "#e08a0b",
+  transition: "#3a6fe0",
+  lanthanide: "#9b59e6",
+  actinide: "#7c4dcc",
+  posttransition: "#22a35a",
+  metalloid: "#a98f0a",
+  nonmetal: "#0fa3b8",
+  halogen: "#2b8fbf",
+  noble: "#6f86a8",
 };
 
 // [category, summary] keyed by Z, 1..118.

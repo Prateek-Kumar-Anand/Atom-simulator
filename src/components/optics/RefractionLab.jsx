@@ -71,12 +71,12 @@ export default function RefractionLab() {
             <Readout label="n1" value={fmt(n1, 4)} />
             <Readout label="n2" value={fmt(n2, 4)} />
             {result.totalInternalReflection ? (
-              <Readout label="Result" value="Total internal reflection" accent="#ef5b6f" />
+              <Readout label="Result" value="Total internal reflection" accent="#e23d57" />
             ) : (
-              <Readout label="Refraction angle θ₂" value={`${fmt(result.theta2Deg, 2)}°`} accent="#4fd8e0" />
+              <Readout label="Refraction angle θ₂" value={`${fmt(result.theta2Deg, 2)}°`} accent="#0fa3b8" />
             )}
             {result.criticalAngleDeg != null && (
-              <Readout label="Critical angle" value={`${fmt(result.criticalAngleDeg, 2)}°`} accent="#f2a94e" />
+              <Readout label="Critical angle" value={`${fmt(result.criticalAngleDeg, 2)}°`} accent="#e08a0b" />
             )}
           </div>
           <button
