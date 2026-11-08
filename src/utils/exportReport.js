@@ -16,7 +16,7 @@
  * -----------------------------------------------------------------------
  */
 
-export const REPORT_TITLE = "QUANTA — Atomic Physics Laboratory";
+export const REPORT_TITLE = "QUANTA — Physics & Mathematics Laboratory";
 export const CSV_COLUMNS = ["No.", "Date", "Time", "Module", "Experiment", "Setup", "Result"];
 const EMPTY = "—";
 const WIDTH = 78;

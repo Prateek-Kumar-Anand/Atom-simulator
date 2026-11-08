@@ -1,8 +1,8 @@
 import React from "react";
-import { Orbit, Waves, Lightbulb, Activity, FlaskConical, Thermometer, Droplets, Atom, Zap, Telescope } from "lucide-react";
+import { Orbit, Waves, Lightbulb, Activity, FlaskConical, Thermometer, Droplets, Atom, Zap, Telescope, Sigma, Compass, ArrowUpRight } from "lucide-react";
 import { MODULES, useApp } from "../../context/AppContext";
 
-const ICONS = { atom: Orbit, spectrum: Waves, photoelectric: Lightbulb, decay: Activity, particles: FlaskConical, thermo: Thermometer, fluid: Droplets, quantum: Atom, electromagnetism: Zap, optics: Telescope };
+const ICONS = { atom: Orbit, spectrum: Waves, photoelectric: Lightbulb, decay: Activity, particles: FlaskConical, thermo: Thermometer, fluid: Droplets, quantum: Atom, electromagnetism: Zap, optics: Telescope, real: Sigma, complex: Compass, vector: ArrowUpRight };
 
 export default function Sidebar() {
   const { active, setActive, visited } = useApp();

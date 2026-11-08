@@ -6,7 +6,7 @@ export default function TopBar() {
   return (
     <header className="qp-topbar">
       <div className="qp-brand">
-        <span className="qp-brand-mark">Q</span>UANTA <span className="qp-brand-sub">{"// "}Atomic Physics Laboratory</span>
+        <span className="qp-brand-mark">Q</span>UANTA <span className="qp-brand-sub">{"// "}Physics &amp; Mathematics Laboratory</span>
       </div>
       <div className="qp-progress">
         <span>SESSION PROGRESS</span>

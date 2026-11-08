@@ -83,4 +83,34 @@ export const THEORY = {
       "Dispersion: a glass's refractive index n(λ) is slightly higher for shorter wavelengths, so a prism bends violet light more than red — tracing each color's ray through both faces of a prism fans white light into a spectrum, the same demonstration Newton used in 1666.",
     ],
   },
+  real: {
+    title: "Real analysis",
+    body: [
+      "A sequence converges to L when, for every ε > 0, there is an N such that |aₙ − L| < ε for all n ≥ N. The smaller the tolerance ε, the further out N has to be — the lab finds the smallest N for you.",
+      "A series Σaₙ converges when its partial sums Sₙ converge. The ratio test (ρ = lim |aₙ₊₁/aₙ|) and root test give convergence for ρ < 1 and divergence for ρ > 1; ρ = 1 is inconclusive — the harmonic series diverges while Σ1/n² converges, and both have ρ = 1. Conditionally convergent series such as the alternating harmonic series converge only because of cancellation.",
+      "f is continuous at a when for every ε > 0 there is a δ > 0 with |x − a| < δ ⇒ |f(x) − f(a)| < ε. For 1/x the δ that works shrinks as a → 0, so the function is continuous everywhere on (0, ∞) but not uniformly continuous there.",
+      "The Riemann integral is the common value of the lower sums L(f, P) and upper sums U(f, P) as the partition P refines; f is integrable exactly when U − L can be made arbitrarily small. Midpoint and trapezoid sums converge faster (error ∝ 1/n²) than left and right sums (∝ 1/n) for smooth f.",
+      "Taylor's theorem: f(x) = Tₙ(x) + Rₙ(x) with Lagrange remainder |Rₙ(x)| ≤ M|x|ⁿ⁺¹/(n+1)!, where M bounds |f⁽ⁿ⁺¹⁾|. For sin, cos and eˣ the remainder → 0 for every x (radius ∞); for ln(1+x), 1/(1−x) and arctan x the series converges only for |x| < 1, however smooth the function is.",
+    ],
+  },
+  complex: {
+    title: "Complex analysis",
+    body: [
+      "A complex number z = x + iy is a point (x, y) of the plane, with modulus |z| = √(x² + y²) and argument θ = arg z. Euler's formula e^(iθ) = cos θ + i sin θ gives the polar form z = r·e^(iθ), so multiplying complex numbers multiplies their moduli and adds their arguments.",
+      "De Moivre: zⁿ = rⁿ·e^(inθ). The equation wⁿ = z has exactly n solutions, ⁿ√r · e^(i(θ + 2πk)/n) for k = 0 … n−1: they lie on a circle, equally spaced at 360°/n.",
+      "An analytic function (complex-differentiable on an open set) satisfies the Cauchy–Riemann equations and is conformal wherever f′(z) ≠ 0: it rotates every tangent direction by arg f′(z) and scales lengths by |f′(z)|, so it preserves angles. At zeros of f′ (such as z = 0 for z²) angles are multiplied instead.",
+      "Domain colouring plots hue = arg f(z) and brightness = |f(z)|. Around a zero of order m the hue wheel winds m times in one direction, around a pole of order m in the opposite direction — the argument principle in picture form.",
+      "Iterating z → z² + c: the Mandelbrot set is the set of c whose orbit of 0 stays bounded; the Julia set J_c is the boundary of the points that stay bounded for that c. J_c is connected exactly when c is in the Mandelbrot set, and Cantor dust otherwise (Fatou–Julia).",
+    ],
+  },
+  vector: {
+    title: "Vector spaces, gradients and the Laplace equation",
+    body: [
+      "Vectors v₁, v₂ form a basis of ℝ² when they are linearly independent (det[v₁ v₂] ≠ 0): every w is then c₁v₁ + c₂v₂ for exactly one pair (c₁, c₂). Gram–Schmidt turns any basis into an orthonormal one. A matrix is a linear map; its eigenvectors are the directions it only stretches, with det = λ₁λ₂ and trace = λ₁ + λ₂.",
+      "The gradient ∇f = (∂f/∂x, ∂f/∂y) points in the direction of steepest ascent, is perpendicular to the level curves of f, and its length is the steepest slope. The directional derivative along a unit vector u is D_u f = ∇f · u.",
+      "Gradient descent minimises f by iterating x ← x − η∇f(x). It converges for small enough η (for a quadratic with curvature λ_max, η < 2/λ_max); ill-conditioned valleys make it zig-zag, and heavy-ball momentum v ← βv − η∇f damps the zig-zag. Saddle points and several local minima (Himmelblau) show why the start point matters.",
+      "Laplace's equation ∇²u = ∂²u/∂x² + ∂²u/∂y² = 0 governs steady-state temperature, electrostatic potential and irrotational flow. Its solutions (harmonic functions) obey the mean-value property — u at a point equals the average of u on any circle around it — and the maximum principle: extrema occur on the boundary.",
+      "Discretised on a grid, ∇²u = 0 says each interior value is the average of its four neighbours. That makes Jacobi iteration exactly gradient descent on the Dirichlet energy E = ½∫|∇u|² with step ¼; Gauss–Seidel and over-relaxation (SOR) are faster descents on the same energy.",
+    ],
+  },
 };

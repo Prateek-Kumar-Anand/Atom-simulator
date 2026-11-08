@@ -4,7 +4,7 @@ QUANTA is an interactive browser-based physics lab for exploring atomic, quantum
 
 ## Features
 
-- **10 guided lab modules** covering atomic structure, hydrogen spectra, photoelectric emission, radioactive decay, particle collisions, thermodynamics, fluid dynamics, quantum physics, electromagnetism, and optics.
+- **13 guided lab modules** — ten physics labs (atomic structure, hydrogen spectra, photoelectric emission, radioactive decay, particle collisions, thermodynamics, fluid dynamics, quantum physics, electromagnetism, optics) and three mathematics labs (real analysis, complex analysis, vector spaces).
 - **Interactive 3D and chart-based visualizations** using Three.js, React Three Fiber, and Recharts.
 - **Built-in theory drawer** that summarizes the governing equations and concepts for each module.
 - **Session progress tracking** as learners visit each lab.
@@ -26,6 +26,9 @@ QUANTA is an interactive browser-based physics lab for exploring atomic, quantum
 | 08 | Quantum Physics | Double-slit interference, tunneling, and entanglement demonstrations. |
 | 09 | Electromagnetism | Electric fields, magnetic fields, Lorentz force, and electromagnetic waves. |
 | 10 | Optics | Lenses, mirrors, refraction, diffraction, and interference. |
+| 11 | Real Analysis | ε–N limits of sequences, series convergence (ratio/root tests), ε–δ continuity, Riemann/Darboux integration, Taylor series with Lagrange remainder. |
+| 12 | Complex Analysis | Argand plane (products, powers, n-th roots), conformal mappings with f′(z) at a point, domain colouring, Mandelbrot and Julia sets. |
+| 13 | Vector Spaces | Span, basis and Gram–Schmidt; linear maps and eigenvectors; gradient fields and directional derivatives; gradient descent with momentum; Laplace's equation solved by Jacobi / Gauss–Seidel / SOR / gradient descent on the Dirichlet energy. |
 
 ## Exporting Results
 
@@ -84,6 +87,14 @@ npm run build
 npm run preview
 ```
 
+### Tests for the maths modules
+
+```bash
+npm run test:math
+```
+
+Runs `tests/math.test.mjs` (uses `tsx`, fetched on demand by `npx`): complex identities, ε–N / series / Riemann / Taylor results against closed forms, eigenvectors, gradients against finite differences, descent convergence, and the Laplace solvers against the exact solution.
+
 ### Linting
 
 ```bash
@@ -118,6 +129,7 @@ npm run lint
 │   │   ├── quantum/
 │   │   ├── spectrum/
 │   │   └── thermo/
+│   ├── math/             # complex.js, realAnalysis.js, vectorSpace.js (pure, tested)
 │   ├── hooks/
 │   ├── physics/
 │   └── utils/            # exportReport.js (CSV + text report builders)

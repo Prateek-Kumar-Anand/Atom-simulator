@@ -15,6 +15,9 @@ import FluidLab from "./components/fluid/FluidLab";
 import QuantumLab from "./components/quantum/QuantumLab";
 import EMLab from "./components/electromagnetism/EMLab";
 import OpticsLab from "./components/optics/OpticsLab";
+import RealAnalysisLab from "./components/real/RealAnalysisLab";
+import ComplexAnalysisLab from "./components/complex/ComplexAnalysisLab";
+import VectorSpaceLab from "./components/vector/VectorSpaceLab";
 
 const LABS = {
   atom: AtomLab,
@@ -27,6 +30,9 @@ const LABS = {
   quantum: QuantumLab,
   electromagnetism: EMLab,
   optics: OpticsLab,
+  real: RealAnalysisLab,
+  complex: ComplexAnalysisLab,
+  vector: VectorSpaceLab,
 };
 
 function AppShell() {

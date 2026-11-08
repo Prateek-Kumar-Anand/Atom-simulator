@@ -13,6 +13,9 @@ export const MODULES = [
   { key: "quantum", label: "Quantum Physics", code: "08" },
   { key: "electromagnetism", label: "Electromagnetism", code: "09" },
   { key: "optics", label: "Optics", code: "10" },
+  { key: "real", label: "Real Analysis", code: "11" },
+  { key: "complex", label: "Complex Analysis", code: "12" },
+  { key: "vector", label: "Vector Spaces", code: "13" },
 ];
 
 const AppContext = createContext(null);
