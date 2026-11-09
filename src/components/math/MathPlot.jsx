@@ -74,7 +74,7 @@ export function Arrow({ x1, y1, x2, y2, color = PLOT.teal, width = 2, dashed = f
  */
 export default function MathPlot({
   xr, yr, width = 560, height = 320, square = false, grid = true, axes = true,
-  xLabel, yLabel, paint, paintKey = "", paintRes = 190, onPointer, label, children, ticksTarget = 8,
+  xLabel, yLabel, paint, paintKey = "", paintRes = 190, onPointer, label, children, ticksTarget = 8, yTicks = true, xTicks = true,
 }) {
   const [x0, x1] = xr, [y0, y1] = yr;
   // The SVG is drawn at its real on-screen pixel width (measured), so text and strokes never get scaled.
@@ -143,13 +143,13 @@ export default function MathPlot({
         style={{ touchAction: onPointer ? "none" : undefined }} {...handlers}
       >
         {grid && xt.map((t) => <line key={"gx" + t} x1={X(t)} x2={X(t)} y1={0} y2={H} stroke={PLOT.grid} />)}
-        {grid && yt.map((t) => <line key={"gy" + t} x1={0} x2={W} y1={Y(t)} y2={Y(t)} stroke={PLOT.grid} />)}
+        {grid && yTicks && yt.map((t) => <line key={"gy" + t} x1={0} x2={W} y1={Y(t)} y2={Y(t)} stroke={PLOT.grid} />)}
         {axes && ax !== null && <line x1={ax} x2={ax} y1={0} y2={H} stroke={PLOT.gridStrong} strokeWidth={1.3} />}
         {axes && ay !== null && <line x1={0} x2={W} y1={ay} y2={ay} stroke={PLOT.gridStrong} strokeWidth={1.3} />}
-        {xt.map((t) => (
+        {xTicks && xt.map((t) => (
           <text key={"tx" + t} x={X(t)} y={H - 5} fontSize={10} fill={PLOT.text} textAnchor="middle" stroke="rgba(255,255,255,0.8)" strokeWidth={3} paintOrder="stroke">{fmtTick(t)}</text>
         ))}
-        {yt.map((t) => (
+        {yTicks && yt.map((t) => (
           <text key={"ty" + t} x={4} y={Y(t) - 3} fontSize={10} fill={PLOT.text} stroke="rgba(255,255,255,0.8)" strokeWidth={3} paintOrder="stroke">{fmtTick(t)}</text>
         ))}
         {xLabel && <text x={W - 6} y={H - 16} fontSize={11} fill={PLOT.text} textAnchor="end" fontStyle="italic" stroke="rgba(255,255,255,0.85)" strokeWidth={3} paintOrder="stroke">{xLabel}</text>}

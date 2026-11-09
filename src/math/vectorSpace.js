@@ -226,3 +226,37 @@ export const LAPLACE_PRESETS = [
   { key: "sine", label: "Sine top — exact solution known", exact: (x, y) => Math.sin(Math.PI * x) * Math.sinh(Math.PI * y) / Math.sinh(Math.PI), bc: { top: (x) => Math.sin(Math.PI * x), bottom: () => 0, left: () => 0, right: () => 0 } },
   { key: "ramp", label: "Linear ramp left → right", exact: (x) => x, bc: { top: (x) => x, bottom: (x) => x, left: () => 0, right: () => 1 } },
 ];
+
+/** Classify the linear system x′ = J x by trace and determinant. */
+export function classifyLinear(tr, det) {
+  const eps = 1e-6;
+  if (Math.abs(det) < eps) return "degenerate (det ≈ 0): a line of equilibria or a shear";
+  if (det < 0) return "saddle — unstable";
+  const disc = tr * tr - 4 * det;
+  if (Math.abs(tr) < eps) return "centre — closed orbits (neutral)";
+  if (disc >= 0) return tr < 0 ? "stable node — flow converges" : "unstable node — flow diverges";
+  return tr < 0 ? "stable spiral — flow spirals inward" : "unstable spiral — flow spirals outward";
+}
+
+/** Central-difference Jacobian of F(x, y) = (P, Q). Returns [[Px, Py], [Qx, Qy]]. */
+export function jacobian(P, Q, x, y, h = 1e-5) {
+  return [
+    [(P(x + h, y) - P(x - h, y)) / (2 * h), (P(x, y + h) - P(x, y - h)) / (2 * h)],
+    [(Q(x + h, y) - Q(x - h, y)) / (2 * h), (Q(x, y + h) - Q(x, y - h)) / (2 * h)],
+  ];
+}
+
+/** Trajectory of x′ = F(x) from (x0, y0) by RK4 with a normalised (arc-length-like) step. */
+export function flowTrajectory(P, Q, x0, y0, win, dt = 0.04, steps = 600, dir = 1) {
+  const pts = [[x0, y0]];
+  let x = x0, y = y0;
+  const F = (px, py) => [dir * P(px, py), dir * Q(px, py)];
+  for (let i = 0; i < steps; i++) {
+    const k1 = F(x, y), k2 = F(x + (dt / 2) * k1[0], y + (dt / 2) * k1[1]), k3 = F(x + (dt / 2) * k2[0], y + (dt / 2) * k2[1]), k4 = F(x + dt * k3[0], y + dt * k3[1]);
+    x += (dt / 6) * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0]);
+    y += (dt / 6) * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1]);
+    if (!Number.isFinite(x) || !Number.isFinite(y) || Math.abs(x) > win * 1.5 || Math.abs(y) > win * 1.5) break;
+    pts.push([x, y]);
+  }
+  return pts;
+}

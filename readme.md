@@ -22,8 +22,8 @@ QUANTA is an interactive browser-based physics lab for exploring atomic, quantum
 | 04 | Radioactive Decay | Half-life, exponential decay, activity, and stochastic population behavior. |
 | 05 | Particle Collisions | Elastic collisions, mass ratios, momentum, kinetic energy, and wall bounces. |
 | 06 | Thermodynamics | Ideal-gas state variables and isothermal, isobaric, isochoric, and adiabatic processes. |
-| 07 | Fluid Dynamics | Continuity, Bernoulli behavior, pressure/velocity tradeoffs, and Reynolds number. |
-| 08 | Quantum Physics | Double-slit interference, tunneling, and entanglement demonstrations. |
+| 07 | Fluid Dynamics (Hydrodynamics) | 7 experiments: pipe flow & Venturi (continuity, Bernoulli, Reynolds), hydrostatics & buoyancy, Torricelli draining tank, Poiseuille flow (Q ∝ R⁴), potential flow past a cylinder with circulation and lift, sphere drag & terminal velocity, and dispersive surface waves with particle orbits. |
+| 08 | Quantum Physics | 9 experiments: double slit, tunneling, entanglement, plus particle in a box (levels and superposition beating), harmonic oscillator (forbidden-region leakage, coherent state), wave-packet scattering (split-operator Schrödinger solver), spin-½ / qubit (Bloch sphere, gates, Stern–Gerlach chains), hydrogen orbitals, and a Mach–Zehnder interferometer with an Elitzur–Vaidman bomb tester. |
 | 09 | Electromagnetism | Electric fields, magnetic fields, Lorentz force, and electromagnetic waves. |
 | 10 | Optics | Lenses, mirrors, refraction, diffraction, and interference. |
 | 11 | Real Analysis | ε–N limits of sequences, series convergence (ratio/root tests), ε–δ continuity, Riemann/Darboux integration, Taylor series with Lagrange remainder. |
@@ -87,13 +87,26 @@ npm run build
 npm run preview
 ```
 
-### Tests for the maths modules
+### Typing your own equations
+
+Complex Analysis (*Conformal mapping*, *Domain colouring*) and Vector Spaces (*Gradient field*, *Gradient descent*, and the new *Custom map* lab) accept a typed formula.
+The parser (`src/math/expr.js`) is a safe tokenizer + Pratt parser — it never uses `eval`.
+
+| Where | Variables | Example |
+| --- | --- | --- |
+| Complex maps `w = f(z)` | `z` (or `x`, `y`), `i`, `pi`, `e` | `(z^2+1)/(z-1)`, `exp(i*z)`, `sin(z)*cosh(z)`, `2z(z+1)` |
+| Scalar functions `f(x, y)` | `x`, `y`, `pi`, `e` | `x^2 + 3*y^2 + sin(2*x)` |
+| Vector maps `F = (P, Q)` | `x`, `y` | `P = y`, `Q = -sin(x) - 0.2*y` |
+
+Operators `+ − * / ^` (with implicit multiplication such as `2x` and `2(x+1)`), functions `sin cos tan asin acos atan sinh cosh tanh exp ln log sqrt abs` (complex also `conj re im arg`), constants `pi`, `e`, `tau`. Mistakes are reported inline ("Unknown name 'q'", "Missing closing parenthesis") and the last valid formula stays on screen while you type. Derivatives and Jacobians are computed numerically, so every analytic check still works for your own formula.
+
+### Tests
 
 ```bash
 npm run test:math
 ```
 
-Runs `tests/math.test.mjs` (uses `tsx`, fetched on demand by `npx`): complex identities, ε–N / series / Riemann / Taylor results against closed forms, eigenvectors, gradients against finite differences, descent convergence, and the Laplace solvers against the exact solution.
+Runs three suites with `tsx` (fetched on demand by `npx`): `tests/math.test.mjs` (complex identities, ε–N / series / Riemann / Taylor results against closed forms, eigenvectors, gradients against finite differences, descent convergence, Laplace solvers against the exact solution, linearisation and flow helpers), `tests/expr.test.mjs` (the formula parser) and `tests/labs.test.mjs` (quantum and hydrodynamic physics: box and oscillator normalisation and energies, solver unitarity and uncertainty, Bloch-sphere gates and Stern–Gerlach 25 %, hydrogen radial normalisation and ⟨r⟩, Mach–Zehnder and bomb-tester probabilities, buoyancy, Torricelli, Poiseuille, Kutta–Joukowski lift, terminal velocity and wave dispersion).
 
 ### Linting
 
@@ -129,7 +142,7 @@ npm run lint
 │   │   ├── quantum/
 │   │   ├── spectrum/
 │   │   └── thermo/
-│   ├── math/             # complex.js, realAnalysis.js, vectorSpace.js (pure, tested)
+│   ├── math/             # complex.js, realAnalysis.js, vectorSpace.js, expr.js (pure, tested)
 │   ├── hooks/
 │   ├── physics/
 │   └── utils/            # exportReport.js (CSV + text report builders)

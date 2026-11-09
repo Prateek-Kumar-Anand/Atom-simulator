@@ -11,7 +11,7 @@ import PhotoelectricLab from "./components/photoelectric/PhotoelectricLab";
 import DecayLab from "./components/decay/DecayLab";
 import ParticleLab from "./components/particles/ParticleLab";
 import ThermoLab from "./components/thermo/ThermoLab";
-import FluidLab from "./components/fluid/FluidLab";
+import HydroLab from "./components/fluid/HydroLab";
 import QuantumLab from "./components/quantum/QuantumLab";
 import EMLab from "./components/electromagnetism/EMLab";
 import OpticsLab from "./components/optics/OpticsLab";
@@ -26,7 +26,7 @@ const LABS = {
   decay: DecayLab,
   particles: ParticleLab,
   thermo: ThermoLab,
-  fluid: FluidLab,
+  fluid: HydroLab,
   quantum: QuantumLab,
   electromagnetism: EMLab,
   optics: OpticsLab,

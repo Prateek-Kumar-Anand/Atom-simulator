@@ -4,6 +4,8 @@ import Readout from "../common/Readout";
 import MathPlot, { PLOT, Slider } from "../math/MathPlot";
 import { FIELDS, descend } from "../../math/vectorSpace";
 import { makeFieldPainter } from "./fieldPaint";
+import EquationInput, { useFormula } from "../math/EquationInput";
+import { makeCustomField } from "./customField";
 import { fmt } from "../../physics/constants";
 import { useApp } from "../../context/AppContext";
 
@@ -12,16 +14,23 @@ const STATUS = { converged: "converged (|∇f| < 10⁻⁵)", diverged: "diverged
 export default function DescentLab() {
   const { log } = useApp();
   const [key, setKey] = useState("ravine");
-  const field = FIELDS.find((f) => f.key === key) || FIELDS[0];
-  const [start, setStart] = useState(field.start);
-  const [logEta, setLogEta] = useState(Math.log10(field.eta));
+  const [custom, setCustom] = useState("x^4 + y^4 - 4*x*y + 1");
+  const [half, setHalf] = useState(3);
+  const formula = useFormula(custom, "real", ["x", "y"]);
+  const isCustom = key === "custom";
+  const field = useMemo(
+    () => (isCustom ? makeCustomField(formula.f || (() => 0), custom, half) : FIELDS.find((f) => f.key === key) || FIELDS[0]),
+    [isCustom, key, formula.f, custom, half]
+  );
+  const [start, setStart] = useState(FIELDS[1].start);
+  const [logEta, setLogEta] = useState(Math.log10(FIELDS[1].eta));
   const [beta, setBeta] = useState(0);
   const [k, setK] = useState(0);
   const [playing, setPlaying] = useState(true);
   const eta = Math.pow(10, logEta);
 
   const pick = (nk) => {
-    const f = FIELDS.find((e) => e.key === nk);
+    const f = FIELDS.find((e) => e.key === nk) || makeCustomField(() => 0, "", half);
     setKey(nk); setStart(f.start); setLogEta(Math.log10(f.eta)); setBeta(0);
   };
 
@@ -57,7 +66,7 @@ export default function DescentLab() {
         <div className="qp-card">
           <h4>Descent path on {field.label}</h4>
           <MathPlot
-            xr={[x0d, x1d]} yr={[y0d, y1d]} square paint={painter} paintKey={key} paintRes={200} xLabel="x" yLabel="y" label="Gradient descent path"
+            xr={[x0d, x1d]} yr={[y0d, y1d]} square paint={painter} paintKey={`${key}|${isCustom ? custom + half : ""}`} paintRes={200} xLabel="x" yLabel="y" label="Gradient descent path"
             onPointer={(t, q) => { if (t === "down") setStart([Number(Math.max(x0d, Math.min(x1d, q.x)).toFixed(2)), Number(Math.max(y0d, Math.min(y1d, q.y)).toFixed(2))]); }}
           >
             {({ X, Y }) => (
@@ -88,7 +97,18 @@ export default function DescentLab() {
           <h4>Problem</h4>
           <select className="qp-select" value={key} onChange={(e) => pick(e.target.value)} aria-label="Function to minimise">
             {FIELDS.map((f) => <option key={f.key} value={f.key}>{f.label}</option>)}
+            <option value="custom">✎ Custom formula…</option>
           </select>
+          {isCustom && (
+            <>
+              <EquationInput
+                label="Type the function to minimise" prefix="f(x, y) =" value={custom} onChange={setCustom} error={formula.error}
+                hint="Use x, y, pi, e, + − * / ^, sin cos exp ln sqrt abs …"
+                examples={["x^4 + y^4 - 4*x*y + 1", "(x-1)^2 + 5*(y+0.5)^2", "x^2 + y^2 + 3*sin(2*x)*sin(2*y)", "abs(x) + abs(y)", "x^2*y^2 + x^2 + y^2"]}
+              />
+              <Slider label="Window half-width" value={half} min={1} max={12} step={0.5} onChange={(v) => { setHalf(v); setStart([Number((v * 0.6).toFixed(2)), Number((v * 0.45).toFixed(2))]); }} format={(v) => v.toFixed(1)} />
+            </>
+          )}
           <Slider label="Learning rate η" value={logEta} min={-4} max={0.5} step={0.05} onChange={setLogEta} format={() => fmt(eta, 3)} />
           <Slider label="Momentum β" value={beta} min={0} max={0.95} step={0.01} onChange={setBeta} format={(v) => v.toFixed(2)} />
           <div className="qp-btn-row">

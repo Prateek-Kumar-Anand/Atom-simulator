@@ -1,7 +1,9 @@
 import React, { useMemo, useState } from "react";
 import { Info } from "lucide-react";
 import Readout from "../common/Readout";
-import MathPlot, { PLOT, Arrow, pathD } from "../math/MathPlot";
+import MathPlot, { PLOT, Arrow, Slider, pathD } from "../math/MathPlot";
+import EquationInput, { useFormula } from "../math/EquationInput";
+import { complexDerivative } from "../../math/expr";
 import * as Cx from "../../math/complex";
 import { useApp } from "../../context/AppContext";
 
@@ -27,8 +29,16 @@ export default function MappingLab() {
   const { log } = useApp();
   const [key, setKey] = useState("square");
   const [z0, setZ0] = useState([0.9, 0.6]);
-  const map = Cx.MAPPINGS.find((m) => m.key === key) || Cx.MAPPINGS[0];
-  const lim = WIN[key];
+  const [custom, setCustom] = useState("z^2 + 0.5z");
+  const [customWin, setCustomWin] = useState(4);
+  const formula = useFormula(custom, "complex");
+  const isCustom = key === "custom";
+  const map = useMemo(() => {
+    if (!isCustom) return Cx.MAPPINGS.find((m) => m.key === key) || Cx.MAPPINGS[0];
+    const f = formula.f || ((z) => z);
+    return { key: "custom", label: `w = ${custom}`, f, df: (z) => complexDerivative(f, z), note: "Your own formula — f′(z) is computed numerically, so the conformal check works for any analytic expression." };
+  }, [isCustom, key, custom, formula.f]);
+  const lim = isCustom ? customWin : WIN[key];
   const lines = useMemo(() => gridLines(map.f, lim), [map, lim]);
   const domainLines = useMemo(() => LINES.flatMap((c) => [
     { kind: "v", c, pts: [[c, -ZR], [c, ZR]] }, { kind: "h", c, pts: [[-ZR, c], [ZR, c]] },
@@ -69,7 +79,7 @@ export default function MappingLab() {
             </MathPlot>
           </div>
           <div className="qp-card" style={{ flex: "1 1 300px" }}>
-            <h4>w-plane  ({map.label})</h4>
+            <h4>w-plane  ({isCustom ? "custom" : map.label})</h4>
             <MathPlot xr={[-lim, lim]} yr={[-lim, lim]} square width={420} xLabel="Re w" yLabel="Im w" label="Image plane">
               {({ X, Y }) => (
                 <>
@@ -92,7 +102,18 @@ export default function MappingLab() {
           <h4>Mapping</h4>
           <select className="qp-select" value={key} onChange={(e) => setKey(e.target.value)} aria-label="Mapping">
             {Cx.MAPPINGS.map((m) => <option key={m.key} value={m.key}>{m.label}</option>)}
+            <option value="custom">✎ Custom formula…</option>
           </select>
+          {isCustom && (
+            <>
+              <EquationInput
+                label="Type your own map" prefix="w =" value={custom} onChange={setCustom} error={formula.error}
+                hint="Use z, i, pi, e, + − * / ^, sin cos tan exp log sqrt sinh cosh conj abs … e.g. 2z(z+1)"
+                examples={["z^2 + 0.5z", "z + 1/z", "exp(z) - z", "sin(z)/z", "(z-1)/(z+1)", "z^3 - 3z", "sqrt(z)", "log(z)"]}
+              />
+              <Slider label="w-plane half-width" value={customWin} min={1} max={20} step={0.5} onChange={setCustomWin} format={(v) => v.toFixed(1)} />
+            </>
+          )}
           <p className="qp-muted small" style={{ margin: 0 }}>{map.note}</p>
         </div>
         <div className="qp-card">

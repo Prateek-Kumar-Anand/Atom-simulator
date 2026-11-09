@@ -117,7 +117,7 @@ export default function FluidLab() {
             className="qp-btn"
             onClick={() =>
               log(
-                "Fluid Dynamics",
+                "Fluid Dynamics: Pipe Flow & Venturi",
                 `${fluid.label}, d₂/d₁=${constrictionRatio.toFixed(2)}, v₁=${fmt(v1, 2)} m/s`,
                 `v₂=${fmt(solved.v2, 2)} m/s, P₂=${fmt(solved.P2 / 1000, 2)} kPa, Re=${fmt(solved.Re2, 0)} (${solved.regime2})`
               )

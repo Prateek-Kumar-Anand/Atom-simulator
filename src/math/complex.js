@@ -130,3 +130,21 @@ export function escapeTime(z0, c, max) {
   }
   return max;
 }
+
+/* ---- Extra functions used by the equation parser ---------------------------------------- */
+export const sinh = (z) => [Math.sinh(z[0]) * Math.cos(z[1]), Math.cosh(z[0]) * Math.sin(z[1])];
+export const cosh = (z) => [Math.cosh(z[0]) * Math.cos(z[1]), Math.sinh(z[0]) * Math.sin(z[1])];
+export const tan = (z) => div(sin(z), cos(z));
+export const tanh = (z) => div(sinh(z), cosh(z));
+/** Principal square root. */
+export function sqrt(z) {
+  const r = abs(z);
+  if (r === 0) return [0, 0];
+  return fromPolar(Math.sqrt(r), arg(z) / 2);
+}
+/** General power a^b (principal branch); integer exponents use exact repeated multiplication. */
+export function pow(a, b) {
+  if (Math.abs(b[1]) < 1e-14 && Number.isInteger(b[0]) && Math.abs(b[0]) <= 64) return powInt(a, b[0]);
+  if (a[0] === 0 && a[1] === 0) return b[0] > 0 ? [0, 0] : [NaN, NaN];
+  return exp(mul(b, log(a)));
+}

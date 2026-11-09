@@ -2,11 +2,23 @@ import React, { useState } from "react";
 import DoubleSlitLab from "./DoubleSlitLab";
 import TunnelingLab from "./TunnelingLab";
 import EntanglementLab from "./EntanglementLab";
+import BoxLab from "./BoxLab";
+import OscillatorLab from "./OscillatorLab";
+import WavePacketLab from "./WavePacketLab";
+import QubitLab from "./QubitLab";
+import HydrogenLab from "./HydrogenLab";
+import InterferometerLab from "./InterferometerLab";
 
 const EXPERIMENTS = [
   { key: "doubleSlit", label: "Double Slit", Component: DoubleSlitLab },
   { key: "tunneling", label: "Quantum Tunneling", Component: TunnelingLab },
   { key: "entanglement", label: "Entanglement", Component: EntanglementLab },
+  { key: "box", label: "Particle in a Box", Component: BoxLab },
+  { key: "oscillator", label: "Harmonic Oscillator", Component: OscillatorLab },
+  { key: "packet", label: "Wave-Packet Scattering", Component: WavePacketLab },
+  { key: "qubit", label: "Spin-½ & Qubit", Component: QubitLab },
+  { key: "hydrogen", label: "Hydrogen Orbitals", Component: HydrogenLab },
+  { key: "interferometer", label: "Interferometer", Component: InterferometerLab },
 ];
 
 export default function QuantumLab() {

@@ -5,6 +5,7 @@ import LinearMapLab from "./LinearMapLab";
 import GradientFieldLab from "./GradientFieldLab";
 import DescentLab from "./DescentLab";
 import LaplaceLab from "./LaplaceLab";
+import VectorMapLab from "./VectorMapLab";
 
 const EXPERIMENTS = [
   { key: "span", label: "Span & basis", Component: SpanBasisLab },
@@ -12,6 +13,7 @@ const EXPERIMENTS = [
   { key: "gradient", label: "Gradient field", Component: GradientFieldLab },
   { key: "descent", label: "Gradient descent", Component: DescentLab },
   { key: "laplace", label: "Laplace equation", Component: LaplaceLab },
+  { key: "custom", label: "✎ Custom map (type equations)", Component: VectorMapLab },
 ];
 
 export default function VectorSpaceLab() {
