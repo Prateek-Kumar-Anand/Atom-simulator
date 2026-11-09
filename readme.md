@@ -26,9 +26,9 @@ QUANTA is an interactive browser-based physics lab for exploring atomic, quantum
 | 08 | Quantum Physics | 9 experiments: double slit, tunneling, entanglement, plus particle in a box (levels and superposition beating), harmonic oscillator (forbidden-region leakage, coherent state), wave-packet scattering (split-operator Schrödinger solver), spin-½ / qubit (Bloch sphere, gates, Stern–Gerlach chains), hydrogen orbitals, and a Mach–Zehnder interferometer with an Elitzur–Vaidman bomb tester. |
 | 09 | Electromagnetism | Electric fields, magnetic fields, Lorentz force, and electromagnetic waves. |
 | 10 | Optics | Lenses, mirrors, refraction, diffraction, and interference. |
-| 11 | Real Analysis | ε–N limits of sequences, series convergence (ratio/root tests), ε–δ continuity, Riemann/Darboux integration, Taylor series with Lagrange remainder. |
-| 12 | Complex Analysis | Argand plane (products, powers, n-th roots), conformal mappings with f′(z) at a point, domain colouring, Mandelbrot and Julia sets. |
-| 13 | Vector Spaces | Span, basis and Gram–Schmidt; linear maps and eigenvectors; gradient fields and directional derivatives; gradient descent with momentum; Laplace's equation solved by Jacobi / Gauss–Seidel / SOR / gradient descent on the Dirichlet energy. |
+| 11 | Real Analysis | ε–N limits of sequences, series convergence (ratio/root tests), ε–δ continuity, Riemann/Darboux integration, Taylor series with Lagrange remainder. **3D animations:** a 2-D Riemann sum as boxes that refine onto a typed surface f(x, y), and a Fourier/Gibbs surface of partial sums stacked over N. |
+| 12 | Complex Analysis | Argand plane (products, powers, n-th roots), conformal mappings with f′(z) at a point, domain colouring, Mandelbrot and Julia sets. **3D animations:** |f(z)| landscapes of a typed function (poles, zeros, orbiting point with its image loop), Riemann surfaces of √z, ∛z and log z, and a Riemann sphere that morphs into the image of a Möbius/typed map. |
+| 13 | Vector Spaces | Span, basis and Gram–Schmidt; linear maps and eigenvectors; gradient fields and directional derivatives; gradient descent with momentum; Laplace's equation solved by Jacobi / Gauss–Seidel / SOR / gradient descent on the Dirichlet energy. **3D animations:** streaming RK4 tracers in a typed field F(x, y, z) (Lorenz, Rössler, …) with ∇·F and ∇×F, a 3×3 matrix deforming the unit cube and sphere with eigenvectors, and a ball rolling down a 3D surface by gradient descent. |
 
 ## Exporting Results
 
@@ -87,6 +87,10 @@ npm run build
 npm run preview
 ```
 
+### 3D animations
+
+The 3D labs (marked ◆ in each module) use a small dependency-free renderer, `src/components/math/Scene3D.jsx`: a perspective camera and depth-sorted, flat-shaded polygons on a 2-D canvas. Drag to orbit, scroll to zoom, double-click or *Reset view* to recentre, *Auto-spin* to toggle rotation (off by default when the OS asks for reduced motion).
+
 ### Typing your own equations
 
 Complex Analysis (*Conformal mapping*, *Domain colouring*) and Vector Spaces (*Gradient field*, *Gradient descent*, and the new *Custom map* lab) accept a typed formula.
@@ -106,7 +110,7 @@ Operators `+ − * / ^` (with implicit multiplication such as `2x` and `2(x+1)`)
 npm run test:math
 ```
 
-Runs three suites with `tsx` (fetched on demand by `npx`): `tests/math.test.mjs` (complex identities, ε–N / series / Riemann / Taylor results against closed forms, eigenvectors, gradients against finite differences, descent convergence, Laplace solvers against the exact solution, linearisation and flow helpers), `tests/expr.test.mjs` (the formula parser) and `tests/labs.test.mjs` (quantum and hydrodynamic physics: box and oscillator normalisation and energies, solver unitarity and uncertainty, Bloch-sphere gates and Stern–Gerlach 25 %, hydrogen radial normalisation and ⟨r⟩, Mach–Zehnder and bomb-tester probabilities, buoyancy, Torricelli, Poiseuille, Kutta–Joukowski lift, terminal velocity and wave dispersion).
+Runs four suites with `tsx` (fetched on demand by `npx`): `tests/math.test.mjs` (complex identities, ε–N / series / Riemann / Taylor results against closed forms, eigenvectors, gradients against finite differences, descent convergence, Laplace solvers against the exact solution, linearisation and flow helpers), `tests/expr.test.mjs` (the formula parser) `tests/labs3d.test.mjs` (2-D Riemann sums, Gibbs overshoot, stereographic projection, branch surfaces, 3×3 eigen-decomposition, 3D RK4 and divergence/curl) and `tests/labs.test.mjs` (quantum and hydrodynamic physics: box and oscillator normalisation and energies, solver unitarity and uncertainty, Bloch-sphere gates and Stern–Gerlach 25 %, hydrogen radial normalisation and ⟨r⟩, Mach–Zehnder and bomb-tester probabilities, buoyancy, Torricelli, Poiseuille, Kutta–Joukowski lift, terminal velocity and wave dispersion).
 
 ### Linting
 

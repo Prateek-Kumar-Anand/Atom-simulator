@@ -9,7 +9,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint src --ext .js,.jsx",
-    "test:math": "npx tsx tests/math.test.mjs && npx tsx tests/expr.test.mjs && npx tsx tests/labs.test.mjs"
+    "test:math": "npx tsx tests/math.test.mjs && npx tsx tests/expr.test.mjs && npx tsx tests/labs.test.mjs && npx tsx tests/labs3d.test.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^9.105.6",

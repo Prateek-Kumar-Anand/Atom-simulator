@@ -375,3 +375,20 @@ body {
 .qp-check { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text); cursor: pointer; margin-top: 4px; }
 .qp-check input { accent-color: var(--cyan); }
 @media (max-width: 560px) { .qp-sg-row { grid-template-columns: 1fr; gap: 4px; } .qp-sg-val { text-align: left; } }
+
+/* ---- Scene3D (dependency-free 3-D canvas) ---- */
+.qp-scene3d { width: 100%; }
+.qp-scene3d-canvas {
+  display: block; width: 100%; cursor: grab; border-radius: 14px; border: 1px solid var(--border);
+  background: radial-gradient(120% 90% at 50% 20%, rgba(255, 255, 255, 0.95), rgba(226, 238, 248, 0.7));
+}
+.qp-scene3d-canvas:active { cursor: grabbing; }
+.qp-scene3d-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
+.qp-scene3d-bar .qp-chip { display: inline-flex; align-items: center; gap: 6px; }
+.qp-scene3d-hint { display: inline-flex; align-items: center; gap: 5px; margin-left: auto; }
+@media (max-width: 560px) { .qp-scene3d-hint { margin-left: 0; width: 100%; } }
+.qp-matrix { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 10px; }
+.qp-matrix input {
+  width: 100%; min-width: 0; text-align: center; padding: 7px 4px; border-radius: 9px; border: 1px solid var(--border-strong);
+  background: rgba(255, 255, 255, 0.8); color: var(--text); font-family: var(--mono, 'JetBrains Mono', monospace); font-size: 13px;
+}
